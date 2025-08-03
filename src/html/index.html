@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Proyectos</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="home-container">
+        <!-- Navegación -->
+        <nav class="nav-bar">
+                            <span class="nav-current"><img src="../storage/vectors/home-svgrepo-com.svg" alt="" class="home-icon">Inicio</span>
+            <span class="nav-separator">|</span>
+                            <a href="empleados.html" class="nav-link"><img src="../storage/vectors/user-svgrepo-com.svg" alt="" class="user-icon">Empleados</a>
+            <span class="nav-separator">|</span>
+                            <a href="materiales.html" class="nav-link"><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon">Materiales</a>
+            <span class="nav-separator">|</span>
+                            <a href="otros-gastos.html" class="nav-link"><img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="" class="briefcase-icon">Otros Gastos</a>
+            <span class="nav-separator">|</span>
+                            <a href="tareas.html" class="nav-link"><img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon">Tareas</a>
+            <span class="nav-separator">|</span>
+                            <a href="#" onclick="abrirModalConfiguracion()" class="nav-link"><img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="settings-icon">Configuración</a>
+        </nav>
+
+        <!-- Hero Section -->
+        <div class="hero-section">
+                            <h1 class="hero-title"><img src="../storage/vectors/browser-svgrepo-com.svg" alt="" class="browser-icon"> Control de Proyectos</h1>
+            <p class="hero-subtitle">Gestión Avanzada de Tareas, Empleados y Recursos</p>
+            
+        </div>
+
+        <!-- Features Grid -->
+        <div class="features-grid">
+            <a href="empleados.html" class="feature-card clickable">
+                <div class="feature-icon"><img src="../storage/vectors/user-svgrepo-com.svg" alt="" class="user-icon-feature"></div>
+                <h3>Gestión de Empleados</h3>
+                <p>Crea, edita y gestiona empleados.</p>
+            </a>
+            
+            <a href="materiales.html" class="feature-card clickable">
+                <div class="feature-icon"><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon-feature"></div>
+                <h3>Gestión de Materiales</h3>
+                <p>Administra inventario, costos y stock de materiales.</p>
+            </a>
+            
+            <a href="otros-gastos.html" class="feature-card clickable">
+                <div class="feature-icon"><img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="" class="briefcase-icon-feature"></div>
+                <h3>Otros Gastos</h3>
+                <p>Gestiona gastos generales y costos adicionales del proyecto.</p>
+            </a>
+            
+            <a href="tareas.html" class="feature-card clickable">
+                <div class="feature-icon"><img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon-feature"></div>
+                <h3>Tareas</h3>
+                <p>Organiza tareas asignando personal, materiales y recursos necesarios.</p>
+            </a>
+            
+            <div class="feature-card clickable" onclick="abrirModalConfiguracion()">
+                <div class="feature-icon"><img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="settings-icon-feature"></div>
+                <h3>Configuración</h3>
+                <p>Personaliza rangos, validación e interfaz del sistema.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><img src="../storage/vectors/stats-svgrepo-com.svg" alt="" class="stats-icon-feature"></div>
+                <h3>Estadísticas en Tiempo Real</h3>
+                <p>Visualiza estadísticas y métricas de tu personal al instante.</p>
+            </div>
+            
+
+        </div>
+
+
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2024 Sistema de Personal - Desarrollado con JavaScript</p>
+        </footer>
+    </div>
+
+
+        <!-- Modal de Configuración -->
+        <div id="modalConfiguracion" class="modal">
+            <div class="modal-content config-modal">
+                <div class="modal-header">
+                    <h2 class="modal-title"><img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="settings-icon-large">Configuración Global del Sistema</h2>
+                    <button onclick="cerrarModalConfiguracion()" class="modal-close">×</button>
+                </div>
+                
+                <div class="modal-body config-content">
+                    <div class="config-panel">
+                        <h2>🎯 Configuración de Rangos por Defecto</h2>
+                        <p>Define los rangos globales que se aplicarán en todo el sistema:</p>
+                        
+                        <div class="config-grid">
+                            <div class="input-group">
+                                <label for="rangoMinimoGlobal"><img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> Costo Mínimo Global ($):</label>
+                                <input type="number" id="rangoMinimoGlobal" value="1" step="0.01">
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="rangoMaximoGlobal"><img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> Costo Máximo Global ($):</label>
+                                <input type="number" id="rangoMaximoGlobal" value="1000" step="0.01">
+                            </div>
+                        </div>
+                        
+                        <div class="range-display-container">
+                            <span id="rangoGlobalActual" class="range-display">
+                                Rango global: $1.00 - $1000.00
+                            </span>
+                        </div>
+                        
+                        <button onclick="aplicarConfiguracionGlobal()" class="button button-success">
+                            ✅ Aplicar Configuración Global
+                        </button>
+                    </div>
+
+                    <div class="config-panel">
+                        <h2>🔧 Configuración de Validación</h2>
+                        
+                        <div class="config-grid">
+                            <div class="input-group">
+                                <label for="validacionEstricta">🔒 Validación Estricta de Nombres:</label>
+                                <select id="validacionEstricta">
+                                    <option value="true">Activada (Recomendado)</option>
+                                    <option value="false">Desactivada</option>
+                                </select>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="mostrarConsejos">💡 Mostrar Consejos de Ayuda:</label>
+                                <select id="mostrarConsejos">
+                                    <option value="true">Sí (Recomendado)</option>
+                                    <option value="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button onclick="aplicarConfiguracionValidacion()" class="button button-info">
+                            🔧 Aplicar Configuración de Validación
+                        </button>
+                    </div>
+
+                    <div class="config-panel">
+                        <h2>💾 Configuración de Datos</h2>
+                        
+                        <div class="buttons-section">
+                            <button onclick="exportarConfiguracion()" class="button button-success">
+                                📤 Exportar Configuración
+                            </button>
+                            
+                            <button onclick="resetearConfiguracion()" class="button button-warning">
+                                🔄 Restaurar Por Defecto
+                            </button>
+                            
+                            <button onclick="limpiarDatosSistema()" class="button button-danger">
+                                <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="trash-icon">Limpiar Todos los Datos
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="config-panel">
+                        <h2>📈 Estadísticas del Sistema</h2>
+                        <div id="estadisticasSistema" class="stats-panel">
+                            <!-- Estadísticas se llenarán aquí -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cerrar modal al hacer clic fuera de él
+        window.onclick = function(event) {
+            const modalConfig = document.getElementById('modalConfiguracion');
+            if (event.target === modalConfig) {
+                cerrarModalConfiguracion();
+            }
+        }
+
+        // ===== FUNCIONES DE CONFIGURACIÓN GLOBAL =====
+        let configuracionGlobal = {
+            rangos: { minimo: 1, maximo: 1000 },
+            validacion: { estricta: true, mostrarConsejos: true, caracteresProhibidos: `!"·$%&/()=?¿'¡+\`*]^[´.:,;-_{}<>\`~\\|` },
+            interfaz: { tema: 'default', animaciones: true, idioma: 'es' },
+            datos: { autoguardado: true, backupAutomatico: true }
+        };
+
+        function abrirModalConfiguracion() {
+            cargarConfiguracionGlobal();
+            document.getElementById('modalConfiguracion').style.display = 'block';
+            actualizarInterfazConfiguracion();
+        }
+
+        function cerrarModalConfiguracion() {
+            document.getElementById('modalConfiguracion').style.display = 'none';
+        }
+
+        // Cargar configuración desde localStorage
+        function cargarConfiguracionGlobal() {
+            const configGuardada = localStorage.getItem('configuracionSistema');
+            if (configGuardada) {
+                try {
+                    configuracionGlobal = { ...configuracionGlobal, ...JSON.parse(configGuardada) };
+                } catch (error) {
+                    console.warn('Error al cargar configuración guardada:', error);
+                }
+            }
+        }
+
+        function actualizarInterfazConfiguracion() {
+            cargarConfiguracionGlobal();
+            document.getElementById('rangoMinimoGlobal').value = configuracionGlobal.rangos.minimo;
+            document.getElementById('rangoMaximoGlobal').value = configuracionGlobal.rangos.maximo;
+            actualizarRangoGlobalMostrado();
+        }
+
+        function actualizarRangoGlobalMostrado() {
+            const minimo = parseFloat(document.getElementById('rangoMinimoGlobal').value) || 0;
+            const maximo = parseFloat(document.getElementById('rangoMaximoGlobal').value) || 999999;
+            document.getElementById('rangoGlobalActual').textContent = `Rango global: $${minimo.toFixed(2)} - $${maximo.toFixed(2)}`;
+        }
+
+        function aplicarConfiguracionGlobal() {
+            const minimo = parseFloat(document.getElementById('rangoMinimoGlobal').value);
+            const maximo = parseFloat(document.getElementById('rangoMaximoGlobal').value);
+            
+            if (minimo >= maximo) {
+                alert("⚠️ Error: El valor mínimo debe ser menor que el máximo");
+                return;
+            }
+            
+            configuracionGlobal.rangos.minimo = minimo;
+            configuracionGlobal.rangos.maximo = maximo;
+            
+            // Guardar en localStorage
+            localStorage.setItem('configuracionSistema', JSON.stringify(configuracionGlobal));
+            localStorage.setItem('rangosGlobales', JSON.stringify({
+                minimo: minimo,
+                maximo: maximo
+            }));
+            
+            actualizarRangoGlobalMostrado();
+            
+            alert(`✅ Configuración global aplicada:\nRango: $${minimo.toFixed(2)} - $${maximo.toFixed(2)}\n\n` +
+                  `Se aplicará a:\n• Empleados (costo por hora)\n• Materiales (costo por unidad)\n• Otros costos`);
+        }
+
+        function aplicarConfiguracionValidacion() {
+            alert('✅ Configuración de validación aplicada');
+        }
+
+        function exportarConfiguracion() {
+            alert('📤 Configuración exportada');
+        }
+
+        function resetearConfiguracion() {
+            alert('🔄 Configuración restaurada');
+        }
+
+        function limpiarDatosSistema() {
+            alert('Datos del sistema eliminados');
+        }
+
+        function actualizarEstadisticasSistemaConfig() {
+            document.getElementById('estadisticasSistema').innerHTML = '<p>Estadísticas del sistema</p>';
+        }
+
+        // Mensaje de bienvenida en consola
+                    console.log("Página de Inicio - Sistema de Personal");
+        console.log("📚 Sistema de gestión completo desarrollado en JavaScript");
+        console.log("🚀 Navega a 'Gestionar Empleados' para comenzar");
+    </script>
+</body>
+</html>

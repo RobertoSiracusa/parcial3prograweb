@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Materiales - Sistema de Validación</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navegación -->
+        <nav class="nav-bar">
+                            <a href="index.html" class="nav-link"><img src="../storage/vectors/home-svgrepo-com.svg" alt="" class="home-icon">Inicio</a>
+            <span class="nav-separator">|</span>
+                            <a href="empleados.html" class="nav-link"><img src="../storage/vectors/user-svgrepo-com.svg" alt="" class="user-icon">Empleados</a>
+            <span class="nav-separator">|</span>
+                            <span class="nav-current"><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon">Gestión de Materiales</span>
+            <span class="nav-separator">|</span>
+                            <a href="otros-gastos.html" class="nav-link"><img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="" class="briefcase-icon">Otros Gastos</a>
+            <span class="nav-separator">|</span>
+                            <a href="tareas.html" class="nav-link"><img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon">Tareas</a>
+            <span class="nav-separator">|</span>
+                            <a href="#" onclick="abrirModalConfiguracion()" class="nav-link"><img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="settings-icon">Configuración</a>
+        </nav>
+
+                    <h1 class="section-header"><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon-large">Gestión de Materiales</h1>
+        
+
+        <h2 class="section-header"><img src="../storage/vectors/align-right-svgrepo-com.svg" alt="" class="align-right-icon-large">Gestión de Materiales</h2>
+        <div class="buttons-section">
+            <button onclick="crearMaterialPersonalizado()" class="button button-success">
+                <img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon">Crear Material Nuevo
+            </button>
+            
+            <button onclick="limpiarListaMateriales()" class="button button-warning">
+                <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="trash-icon">Limpiar Lista
+            </button>
+            
+            <button onclick="exportarMateriales()" class="button button-success">
+                📄 Exportar a Consola
+            </button>
+            
+            <button onclick="mostrarRangosDetallados()" class="button button-info">
+                <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon">Ver Detalles de Rangos
+            </button>
+        </div>
+
+        <!-- Lista de Materiales en la página principal -->
+        <div class="empleados-container">
+            <div class="empleados-header">
+                <h2 class="section-header"><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon-large">Lista de Materiales (<span id="contadorMateriales">0</span>)</h2>
+            </div>
+            
+            <div id="estadisticasMateriales" class="stats-panel">
+                <!-- Estadísticas se llenarán aquí -->
+            </div>
+            
+            <div id="listaMateriales" class="employees-list">
+                <!-- Lista de materiales se llenará aquí -->
+            </div>
+        </div>
+
+        <!-- Modal para Crear Material -->
+        <div id="modalCrearMaterial" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title"><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon-large">Crear Nuevo Material</h2>
+                    <button onclick="cerrarModalCrearMaterial()" class="modal-close">×</button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="config-panel">
+                        <h3><img src="../storage/vectors/portrait-user-svgrepo-com.svg" alt="" class="portrait-user-icon-large"> Información del Material</h3>
+                        <p>Complete todos los campos para crear el material:</p>
+                        
+                        <div class="input-group">
+                            <label for="nombreMaterial"><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon">Nombre del Material:</label>
+                            <input type="text" id="nombreMaterial" placeholder="Ej: Cemento Portland">
+                            <small id="errorNombreMaterial" class="error-message"></small>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="costoPorUnidad"><img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> Costo por Unidad ($):</label>
+                            <input type="number" id="costoPorUnidad" step="0.01" min="0" placeholder="Ej: 15.75">
+                            <small id="errorCostoPorUnidad" class="error-message"></small>
+                        </div>
+                        
+                        <div class="info-note">
+                            <strong><img src="../storage/vectors/traffic-light-svgrepo-com.svg" alt="" class="traffic-light-icon"> Información:</strong><br>
+                            • <strong>Inventario inicial:</strong> Comenzará automáticamente en 0 unidades<br>
+                            • <strong>Validación:</strong> El costo debe estar dentro del rango configurado<br>
+                            • <strong>Caracteres prohibidos:</strong> No se permiten caracteres especiales en el nombre<br>
+                            • <strong>Rango actual:</strong> <span id="rangoInfoMaterial">Cargando...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button onclick="validarYCrearMaterial()" class="button button-success">
+                        ✅ Crear Material
+                    </button>
+                    <button onclick="limpiarFormularioMaterial()" class="button button-info">
+                        🔄 Limpiar Campos
+                    </button>
+                    <button onclick="cerrarModalCrearMaterial()" class="button">
+                        ❌ Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal de Configuración -->
+        <div id="modalConfiguracion" class="modal">
+            <div class="modal-content config-modal">
+                <div class="modal-header">
+                    <h2 class="modal-title"><img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="settings-icon-large">Configuración Global del Sistema</h2>
+                    <button onclick="cerrarModalConfiguracion()" class="modal-close">×</button>
+                </div>
+                
+                <div class="modal-body config-content">
+                    <div class="config-panel">
+                        <h2><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon-large">Configuración de Rangos para Materiales</h2>
+                        <p>Define los rangos específicos para costos de materiales:</p>
+                        
+                        <div class="config-grid">
+                            <div class="input-group">
+                                <label for="costoPorUnidadMin">📦 Costo por Unidad - Mínimo ($):</label>
+                                <input type="number" id="costoPorUnidadMin" value="1" step="0.01">
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="costoPorUnidadMax">📦 Costo por Unidad - Máximo ($):</label>
+                                <input type="number" id="costoPorUnidadMax" value="1000" step="0.01">
+                            </div>
+                        </div>
+                        
+                        <div class="info-note">
+                            <strong><img src="../storage/vectors/traffic-light-svgrepo-com.svg" alt="" class="traffic-light-icon"> Nota:</strong> Estos rangos se aplicarán específicamente a materiales:<br>
+                            <strong>📦 Costo por Unidad:</strong> Validación para precios de materiales<br>
+                            <strong>Inventario:</strong> Los materiales pueden tener inventario gestionable<br>
+                            <strong>⚡ Aplicación:</strong> Los cambios se aplicarán inmediatamente en la creación de materiales
+                        </div>
+                        
+                        <div class="range-display-container">
+                            <div id="rangosActuales" class="range-display">
+                                <strong>Rangos configurados:</strong><br>
+                                Materiales: $1.00 - $1000.00
+                            </div>
+                        </div>
+                        
+                        <button onclick="aplicarConfiguracionRangosMateriales()" class="button button-success">
+                            ✅ Aplicar Configuración de Materiales
+                        </button>
+                    </div>
+
+                    <div class="config-panel">
+                        <h2>🔧 Configuración de Validación</h2>
+                        
+                        <div class="config-grid">
+                            <div class="input-group">
+                                <label for="validacionEstricta">🔒 Validación Estricta de Nombres:</label>
+                                <select id="validacionEstricta">
+                                    <option value="true">Activada (Recomendado)</option>
+                                    <option value="false">Desactivada</option>
+                                </select>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="mostrarConsejos">💡 Mostrar Consejos de Ayuda:</label>
+                                <select id="mostrarConsejos">
+                                    <option value="true">Sí (Recomendado)</option>
+                                    <option value="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="caracteresProhibidosPersonalizado">🚫 Caracteres Prohibidos Personalizados:</label>
+                            <input type="text" id="caracteresProhibidosPersonalizado" 
+                                   value="!&quot;·$%&amp;/()=?¿'¡+`*]^[´.:,;-_{}&lt;&gt;`~\|" 
+                                   placeholder="Caracteres no permitidos en nombres">
+                            <small>Modifica los caracteres que no se permiten en los nombres</small>
+                        </div>
+                        
+                        <button onclick="aplicarConfiguracionValidacion()" class="button button-info">
+                            🔧 Aplicar Configuración de Validación
+                        </button>
+                    </div>
+
+                    <div class="config-panel">
+                        <h2>💾 Configuración de Datos</h2>
+                        
+                        <div class="buttons-section">
+                            <button onclick="exportarConfiguracion()" class="button button-success">
+                                📤 Exportar Configuración
+                            </button>
+                            
+                            <button onclick="resetearConfiguracion()" class="button button-warning">
+                                🔄 Restaurar Por Defecto
+                            </button>
+                            
+                            <button onclick="limpiarDatosSistema()" class="button button-danger">
+                                <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="trash-icon">Limpiar Todos los Datos
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="config-panel">
+                        <h2>📈 Estadísticas del Sistema</h2>
+                        <div id="estadisticasSistema" class="stats-panel">
+                            <!-- Estadísticas se llenarán aquí -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../js/Personal.js"></script>
+    <script src="../js/Material.js"></script>
+    <script src="../js/OtrosCostos.js"></script>
+    <script src="../js/materiales.js"></script>
+</body>
+</html>

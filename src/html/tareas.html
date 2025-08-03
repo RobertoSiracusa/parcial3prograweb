@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Tareas - Sistema de Personal</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navegación -->
+        <nav class="nav-bar">
+                            <a href="index.html" class="nav-link"><img src="../storage/vectors/home-svgrepo-com.svg" alt="" class="home-icon">Inicio</a>
+            <span class="nav-separator">|</span>
+                            <a href="empleados.html" class="nav-link"><img src="../storage/vectors/user-svgrepo-com.svg" alt="" class="user-icon">Empleados</a>
+            <span class="nav-separator">|</span>
+                            <a href="materiales.html" class="nav-link"><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon">Materiales</a>
+            <span class="nav-separator">|</span>
+                            <a href="otros-gastos.html" class="nav-link"><img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="" class="briefcase-icon">Otros Gastos</a>
+            <span class="nav-separator">|</span>
+                            <span class="nav-current"><img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon">Tareas</span>
+            <span class="nav-separator">|</span>
+                            <a href="#" onclick="abrirModalConfiguracion()" class="nav-link"><img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="settings-icon">Configuración</a>
+        </nav>
+
+                    <h1 class="section-header"><img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon-large">Gestión de Tareas</h1>
+
+        <div class="buttons-section">
+            <button onclick="crearTareaPersonalizada()" class="button button-success">
+                ➕ Crear Tarea
+            </button>
+            <button onclick="limpiarListaTareas()" class="button button-warning">
+                <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="trash-icon">Limpiar Lista
+            </button>
+            <button onclick="exportarTareas()" class="button button-success">
+                📄 Exportar a Consola
+            </button>
+            <button onclick="mostrarRangosDetallados()" class="button button-info">
+                <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon">Ver Detalles de Rangos
+            </button>
+        </div>
+
+        <!-- Lista de Tareas en la página principal -->
+        <div class="empleados-container">
+            <div class="empleados-header">
+                <h2 class="section-header"><img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon-large">Lista de Tareas (<span id="contadorTareas">0</span>)</h2>
+            </div>
+            <div id="estadisticasTareas" class="stats-panel">
+                <!-- Estadísticas se llenarán aquí -->
+            </div>
+            <div id="listaTareas" class="employees-list">
+                <!-- Lista de tareas se llenará aquí -->
+            </div>
+        </div>
+
+        <!-- Modal para Crear Tarea -->
+        <div id="modalCrearTarea" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">➕ Crear Nueva Tarea</h2>
+                    <button onclick="cerrarModalCrearTarea()" class="modal-close">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="config-panel">
+                        <h3><img src="../storage/vectors/portrait-user-svgrepo-com.svg" alt="" class="portrait-user-icon-large"> Información de la Tarea</h3>
+                        <p>Complete la información básica de la tarea:</p>
+                        <div class="input-group">
+                            <label for="nombreTarea"><img src="../storage/vectors/user-list-svgrepo-com.svg" alt="" class="user-list-icon"> Nombre de la Tarea:</label>
+                            <input type="text" id="nombreTarea" placeholder="Ej: Desarrollar página web">
+                            <small id="errorNombreTarea" class="error-message"></small>
+                        </div>
+                        <div class="input-group">
+                            <label for="duracionTarea">⏱️ Duración (horas):</label>
+                            <input type="number" id="duracionTarea" step="0.5" min="0" placeholder="Ej: 8.5">
+                            <small id="errorDuracionTarea" class="error-message"></small>
+                        </div>
+
+                        <h3><img src="../storage/vectors/user-svgrepo-com.svg" alt="" class="user-icon-large">Asignación de Personal (Opcional)</h3>
+                        <div class="input-group">
+                            <label for="personalAsignado">Seleccionar Personal:</label>
+                            <select id="personalAsignado">
+                                <option value="">-- Sin personal asignado --</option>
+                            </select>
+                        </div>
+
+                        <h3><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon-large">Material Necesario (Opcional)</h3>
+                        <div class="input-group">
+                            <label for="materialAsignado">Seleccionar Material:</label>
+                            <select id="materialAsignado">
+                                <option value="">-- Sin material asignado --</option>
+                            </select>
+                        </div>
+
+                        <h3><img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="" class="briefcase-icon-large">Otros Gastos (Opcional)</h3>
+                        <div class="input-group">
+                            <label for="otrosGastosAsignado">Seleccionar Otros Gastos:</label>
+                            <select id="otrosGastosAsignado">
+                                <option value="">-- Sin otros gastos asignados --</option>
+                            </select>
+                        </div>
+
+                        <div class="info-note">
+                            <strong><img src="../storage/vectors/traffic-light-svgrepo-com.svg" alt="" class="traffic-light-icon"> Información:</strong><br>
+                            • <strong>Duración:</strong> Tiempo estimado para completar la tarea<br>
+                            • <strong>Asignaciones:</strong> Todas son opcionales, puedes crear tareas sin asignar recursos<br>
+                            • <strong>Costo:</strong> Se calculará automáticamente basado en las asignaciones<br>
+                            • <strong>Estado:</strong> Las tareas nuevas inician como "Pendiente"
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="validarYCrearTarea()" class="button button-success">
+                        ✅ Crear Tarea
+                    </button>
+                    <button onclick="limpiarFormularioTarea()" class="button button-info">
+                        🔄 Limpiar Campos
+                    </button>
+                    <button onclick="cerrarModalCrearTarea()" class="button">
+                        ❌ Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Configuración (compartido) -->
+        <div id="modalConfiguracion" class="modal">
+            <div class="modal-content config-modal">
+                <div class="modal-header">
+                    <h2 class="modal-title"><img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="settings-icon-large">Configuración Global del Sistema</h2>
+                    <button onclick="cerrarModalConfiguracion()" class="modal-close">×</button>
+                </div>
+                <div class="modal-body config-content">
+                    <div class="config-panel">
+                        <h2><img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon-large">Configuración de Tareas</h2>
+                        <p>Configuración específica para el módulo de tareas:</p>
+                        
+                        <div class="config-grid">
+                            <div class="input-group">
+                                <label for="duracionMinimaTarea">⏱️ Duración Mínima (horas):</label>
+                                <input type="number" id="duracionMinimaTarea" value="0.5" step="0.1" min="0">
+                            </div>
+                            <div class="input-group">
+                                <label for="duracionMaximaTarea">⏱️ Duración Máxima (horas):</label>
+                                <input type="number" id="duracionMaximaTarea" value="40" step="0.1" min="0">
+                            </div>
+                        </div>
+                        
+                        <div class="info-note">
+                            <strong><img src="../storage/vectors/traffic-light-svgrepo-com.svg" alt="" class="traffic-light-icon"> Nota:</strong> Estos rangos se aplicarán específicamente a las tareas:<br>
+                            <strong>⏱️ Duración:</strong> Tiempo permitido para las tareas<br>
+                            <strong>Validación:</strong> Se validará al crear o editar tareas<br>
+                            <strong>⚡ Aplicación:</strong> Los cambios se aplicarán inmediatamente
+                        </div>
+                        
+                        <div class="range-display-container">
+                            <div id="rangosActualesTareas" class="range-display">
+                                <strong>Rangos configurados:</strong><br>
+                                Duración: 0.5 - 40.0 horas
+                            </div>
+                        </div>
+                        
+                        <button onclick="aplicarConfiguracionTareas()" class="button button-success">
+                            ✅ Aplicar Configuración de Tareas
+                        </button>
+                    </div>
+
+                    <div class="config-panel">
+                        <h2>🔧 Configuración de Validación</h2>
+                        <div class="config-grid">
+                            <div class="input-group">
+                                <label for="validacionEstricta">🔒 Validación Estricta de Nombres:</label>
+                                <select id="validacionEstricta">
+                                    <option value="true">Activada (Recomendado)</option>
+                                    <option value="false">Desactivada</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="mostrarConsejos">💡 Mostrar Consejos de Validación:</label>
+                                <select id="mostrarConsejos">
+                                    <option value="true">Activado</option>
+                                    <option value="false">Desactivado</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="aplicarConfiguracionValidacion()" class="button button-success">
+                            ✅ Aplicar Configuración de Validación
+                        </button>
+                    </div>
+
+                    <div class="config-panel">
+                        <h2>🎨 Configuración de Interfaz</h2>
+                        <div class="config-grid">
+                            <div class="input-group">
+                                <label for="temaInterfaz">🌈 Tema de Interfaz:</label>
+                                <select id="temaInterfaz">
+                                    <option value="default">Por Defecto</option>
+                                    <option value="dark">Oscuro</option>
+                                    <option value="light">Claro</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="animaciones">✨ Animaciones:</label>
+                                <select id="animaciones">
+                                    <option value="true">Activadas</option>
+                                    <option value="false">Desactivadas</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="idioma">🗣️ Idioma:</label>
+                                <select id="idioma">
+                                    <option value="es">Español</option>
+                                    <option value="en">Inglés</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="aplicarConfiguracionInterfaz()" class="button button-success">
+                            ✅ Aplicar Configuración de Interfaz
+                        </button>
+                    </div>
+
+                    <div class="config-panel">
+                        <h2>💾 Gestión de Datos del Sistema</h2>
+                        <div class="config-grid">
+                            <div class="input-group">
+                                <label for="autoguardado">🔄 Autoguardado de Datos:</label>
+                                <select id="autoguardado">
+                                    <option value="true">Activado</option>
+                                    <option value="false">Desactivado</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="backupAutomatico">☁️ Backup Automático:</label>
+                                <select id="backupAutomatico">
+                                    <option value="true">Activado</option>
+                                    <option value="false">Desactivado</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="exportarConfiguracion()" class="button button-info">
+                            📤 Exportar Configuración
+                        </button>
+                        <button onclick="resetearConfiguracion()" class="button button-warning">
+                            🔄 Resetear Configuración
+                        </button>
+                        <button onclick="limpiarDatosSistema()" class="button button-danger">
+                            <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="trash-icon">Limpiar Todos los Datos
+                        </button>
+                    </div>
+
+                    <div class="config-panel">
+                        <h2><img src="../storage/vectors/stats-svgrepo-com.svg" alt="" class="stats-icon-large">Estadísticas del Sistema</h2>
+                        <div id="estadisticasSistema" class="stats-panel">
+                            <!-- Estadísticas se llenarán aquí -->
+                        </div>
+                        <button onclick="actualizarEstadisticasSistemaConfig()" class="button">
+                            Actualizar Estadísticas
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="cerrarModalConfiguracion()" class="button">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/Personal.js"></script>
+    <script src="../js/Material.js"></script>
+    <script src="../js/OtrosCostos.js"></script>
+    <script src="../js/Tarea.js"></script>
+    <script src="../js/tareas.js"></script>
+</body>
+</html>
