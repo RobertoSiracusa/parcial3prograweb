@@ -77,11 +77,12 @@
                 </div>
             </header>
 
-            <!-- Dashboard Content -->
-            <div class="dashboard-content">
-                <!-- Stats Cards -->
-                <div class="stats-section">
-                    <div class="stats-grid">
+                         <!-- Dashboard Content -->
+             <div class="dashboard-content">
+                 <!-- Stats Cards -->
+                 <div class="stats-section">
+                     <h2 class="section-title">Estadísticas</h2>
+                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-icon">
                                 <img src="../storage/vectors/user-svgrepo-com.svg" alt="Empleados" class="stat-icon-img">
@@ -162,21 +163,7 @@
                     </div>
                 </div>
 
-                <!-- Recent Activity -->
-                <div class="recent-activity-section">
-                    <h2 class="section-title">Actividad Reciente</h2>
-                    <div class="activity-list" id="activityList">
-                        <div class="activity-item">
-                            <div class="activity-icon">
-                                <img src="../storage/vectors/clock-svgrepo-com.svg" alt="Actividad" class="activity-icon-img">
-                            </div>
-                            <div class="activity-content">
-                                <p class="activity-text">Sistema iniciado correctamente</p>
-                                <span class="activity-time">Hace unos momentos</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </main>
     </div>
@@ -419,10 +406,10 @@
 
         function actualizarEstadisticasSistemaConfig() {
             // Cargar estadísticas desde localStorage
-            const empleados = JSON.parse(localStorage.getItem('empleados')) || [];
-            const materiales = JSON.parse(localStorage.getItem('materiales')) || [];
-            const tareas = JSON.parse(localStorage.getItem('tareas')) || [];
-            const otrosGastos = JSON.parse(localStorage.getItem('otrosGastos')) || [];
+            const empleados = JSON.parse(localStorage.getItem('empleadosCreados')) || [];
+            const materiales = JSON.parse(localStorage.getItem('materialesCreados')) || [];
+            const tareas = JSON.parse(localStorage.getItem('tareasCreadas')) || [];
+            const otrosGastos = JSON.parse(localStorage.getItem('otrosGastosCreados')) || [];
             
             // Actualizar contadores en el modal
             document.getElementById('totalEmpleadosConfig').textContent = empleados.length;
@@ -430,17 +417,20 @@
             document.getElementById('totalTareasConfig').textContent = tareas.length;
             
             // Calcular total de gastos
-            const totalGastos = otrosGastos.reduce((total, gasto) => total + parseFloat(gasto.costo || 0), 0);
+            const totalGastos = otrosGastos.reduce((total, item) => {
+                const gasto = item.otroGasto;
+                return total + parseFloat(gasto.costoPorUnidad || 0);
+            }, 0);
             document.getElementById('totalGastosConfig').textContent = `$${totalGastos.toFixed(2)}`;
         }
 
         // ===== FUNCIONES DEL DASHBOARD =====
         function cargarEstadisticasDashboard() {
             // Cargar estadísticas desde localStorage
-            const empleados = JSON.parse(localStorage.getItem('empleados')) || [];
-            const materiales = JSON.parse(localStorage.getItem('materiales')) || [];
-            const tareas = JSON.parse(localStorage.getItem('tareas')) || [];
-            const otrosGastos = JSON.parse(localStorage.getItem('otrosGastos')) || [];
+            const empleados = JSON.parse(localStorage.getItem('empleadosCreados')) || [];
+            const materiales = JSON.parse(localStorage.getItem('materialesCreados')) || [];
+            const tareas = JSON.parse(localStorage.getItem('tareasCreadas')) || [];
+            const otrosGastos = JSON.parse(localStorage.getItem('otrosGastosCreados')) || [];
             
             // Actualizar contadores
             document.getElementById('totalEmpleados').textContent = empleados.length;
@@ -448,14 +438,55 @@
             document.getElementById('totalTareas').textContent = tareas.length;
             
             // Calcular total de gastos
-            const totalGastos = otrosGastos.reduce((total, gasto) => total + parseFloat(gasto.costo || 0), 0);
+            const totalGastos = otrosGastos.reduce((total, item) => {
+                const gasto = item.otroGasto;
+                return total + parseFloat(gasto.costoPorUnidad || 0);
+            }, 0);
             document.getElementById('totalGastos').textContent = `$${totalGastos.toFixed(2)}`;
+            
+            // Log temporal para verificar
+            console.log('Dashboard Stats:', {
+                empleados: empleados.length,
+                materiales: materiales.length,
+                tareas: tareas.length,
+                gastos: totalGastos,
+                empleadosData: empleados
+            });
+        }
+
+        // Función para actualizar estadísticas desde otras páginas
+        function actualizarEstadisticasDashboard() {
+            cargarEstadisticasDashboard();
         }
 
         // Inicializar dashboard
         document.addEventListener('DOMContentLoaded', function() {
             cargarEstadisticasDashboard();
-            console.log("Dashboard inicializado - Sistema de Control de Proyectos");
+        });
+
+        // Actualizar estadísticas cuando la página se vuelve visible
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                cargarEstadisticasDashboard();
+            }
+        });
+
+        // Actualizar estadísticas cuando se enfoca la ventana
+        window.addEventListener('focus', function() {
+            cargarEstadisticasDashboard();
+        });
+
+        // Actualizar estadísticas cada 1 segundo
+        setInterval(cargarEstadisticasDashboard, 1000);
+
+        // Actualizar estadísticas cuando se hace clic en cualquier lugar
+        document.addEventListener('click', function() {
+            cargarEstadisticasDashboard();
+        });
+
+        // Actualizar estadísticas cuando se presiona cualquier tecla
+        document.addEventListener('keydown', function() {
+            cargarEstadisticasDashboard();
         });
     </script>
 </body>
