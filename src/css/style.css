@@ -3360,13 +3360,13 @@ body {
 }
 
 .dashboard-grid .card:nth-child(2) { /* Salario adquirido por empleado */
-    grid-column: 2;
-    grid-row: 1;
+    grid-column: 1;
+    grid-row: 6;
 }
 
 .dashboard-grid .card:nth-child(3) { /* Materiales */
-    grid-column: 3;
-    grid-row: 1;
+    grid-column: 1;
+    grid-row: 5;
 }
 
 /* Los siguientes cards (Costos Extra, Costos, Distribución) se distribuyen en columnas */
@@ -3376,8 +3376,8 @@ body {
 }
 
 .dashboard-grid .card:nth-child(5) {
-    grid-column: 1;
-    grid-row: 5;
+    grid-column: 2;
+    grid-row: 1;
 }
 
 .dashboard-grid .card:nth-child(6) {
@@ -3386,19 +3386,26 @@ body {
 }
 
 /* Nuevas cards (Clones) se distribuyen con la MISMA distribución que los originales */
-.dashboard-grid .card:nth-child(7) { /* Listado de Gastos Extra (Clon) */
-    grid-column: 1;
-    grid-row: 6;
+.dashboard-grid .card:nth-child(7) { /* Estado de Tareas */
+    grid-column: 3;
+    grid-row: 1;
 }
 
-.dashboard-grid .card:nth-child(8) { /* Contador de Costos (Clon) */
-    grid-column: 1;
-    grid-row: 7;
-}
 
-.dashboard-grid .card:nth-child(9) { /* Distribución de Costos Totales del Proyecto (Clon) */
+
+.dashboard-grid .card:nth-child(8) { /* Distribución de Costos Totales del Proyecto (Clon) */
     grid-column: 2 / 4;
     grid-row: 6 / 8;
+}
+
+.dashboard-grid .card:nth-child(9) { /* Distribución de Salario */
+    grid-column: 1 / 4;
+    grid-row: 9;
+}
+
+.dashboard-grid .card:nth-child(10) { /* Utilización de Empleados */
+    grid-column: 1;
+    grid-row: 7;
 }
 
 .card {
@@ -3561,9 +3568,10 @@ body {
     justify-content: center;
     margin-top: 20px;
     padding: 20px 0;
+    gap: 30px;
 }
 
-.refresh-button {
+#btnActualizarDashboard {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -3579,23 +3587,157 @@ body {
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
-.refresh-button:hover {
+#btnActualizarDashboard:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
-.refresh-button:active {
+#btnActualizarDashboard:active {
     transform: translateY(0);
 }
 
-.refresh-button .button-icon {
+#btnActualizarDashboard .button-icon {
     width: 16px;
     height: 16px;
     transition: transform 0.5s ease;
 }
 
-.refresh-button:active .button-icon {
+#btnActualizarDashboard:active .button-icon {
     transform: rotate(360deg);
+}
+
+/* Estilos para el botón de eliminar datos */
+#btnEliminarDatos {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+#btnEliminarDatos:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+#btnEliminarDatos:active {
+    transform: translateY(0);
+}
+
+#btnEliminarDatos .button-icon {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.5s ease;
+}
+
+#btnEliminarDatos:active .button-icon {
+    transform: rotate(360deg);
+}
+
+/* Estilos específicos para el modal de eliminación de datos */
+#modalEliminarDatosProyecto .confirmacion-mensaje {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    max-width: 100%;
+}
+
+#modalEliminarDatosProyecto .confirmacion-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+    width: 100%;
+    max-width: 100%;
+}
+
+#modalEliminarDatosProyecto .confirmacion-icon img {
+    width: 36px;
+    height: 36px;
+    max-width: 100%;
+    height: auto;
+    filter: invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+}
+
+#modalEliminarDatosProyecto .confirmacion-texto {
+    flex: 1;
+    text-align: left;
+    width: 100%;
+    max-width: 100%;
+}
+
+#modalEliminarDatosProyecto .confirmacion-texto ul {
+    margin: 15px 0;
+    padding-left: 20px;
+}
+
+#modalEliminarDatosProyecto .confirmacion-texto li {
+    margin-bottom: 8px;
+    color: #374151;
+}
+
+#modalEliminarDatosProyecto .confirmacion-texto p {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+/* Estilos para el modal de confirmación exitosa */
+.modal-pequeno {
+    max-width: 300px !important;
+    width: 80% !important;
+}
+
+#modalConfirmacionEliminacion .confirmacion-exitosa {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    max-width: 100%;
+}
+
+#modalConfirmacionEliminacion .confirmacion-texto-exitosa {
+    flex: 1;
+    text-align: center;
+    width: 100%;
+    max-width: 100%;
+}
+
+#modalConfirmacionEliminacion .confirmacion-texto-exitosa p {
+    margin-bottom: 5px;
+    line-height: 1.3;
+    font-size: 14px;
+}
+
+#modalConfirmacionEliminacion .modal-content {
+    padding: 15px;
+}
+
+#modalConfirmacionEliminacion .modal-header {
+    padding: 10px 0;
+}
+
+#modalConfirmacionEliminacion .modal-body {
+    padding: 10px 0;
+}
+
+#modalConfirmacionEliminacion .modal-footer {
+    padding: 10px 0;
+}
+
+#modalConfirmacionEliminacion .modal-title {
+    font-size: 16px;
 }
 
 /* Lista de materiales */
@@ -3737,6 +3879,149 @@ body {
 .extra-cost-value {
     font-weight: 600;
     color: #e67e22;
+}
+
+.extra-cost-info-compact {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.extra-cost-details {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.extra-cost-details .detail {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #e67e22;
+    padding: 2px 6px;
+    background: rgba(230, 126, 34, 0.1);
+    border-radius: 4px;
+}
+
+/* Estado de tareas */
+.tasks-status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.task-status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #3498db;
+}
+
+.task-status-name {
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 0.9rem;
+}
+
+.task-status-badge {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tasks-completion-total {
+    margin-top: 15px;
+    padding: 12px;
+    background: #ecf0f1;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.completion-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.completion-label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+.completion-percentage {
+    font-weight: 700;
+    color: #27ae60;
+    font-size: 1.2rem;
+}
+
+/* Utilización de empleados */
+.employee-utilization-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.employee-utilization-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #3498db;
+    transition: all 0.3s ease;
+}
+
+.employee-utilization-item.over-utilized {
+    border-left-color: #e74c3c;
+    background: #fdf2f2;
+}
+
+.employee-utilization-name {
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 0.9rem;
+}
+
+.employee-utilization-hours {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+}
+
+.hours-normal {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.hours-extra {
+    color: #e74c3c;
+    font-weight: 700;
+    background: rgba(231, 76, 60, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.hours-total {
+    color: #7f8c8d;
+    font-weight: 500;
+    margin-left: 4px;
+}
+
+.empty-utilization {
+    text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+    padding: 20px;
 }
 
 /* Gráfico de costos */
@@ -3942,4 +4227,44 @@ body {
 .dashboard-placeholder p {
     margin: 0;
     line-height: 1.5;
+}
+
+/* Estilos para la distribución de salario */
+.salary-distribution-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.employee-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.employee-selector label {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 14px;
+}
+
+.employee-selector select {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: white;
+    font-size: 14px;
+    color: #1e293b;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.employee-selector select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.employee-selector select:hover {
+    border-color: #667eea;
 }
