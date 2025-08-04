@@ -2,6 +2,62 @@
 // Array global para almacenar todos los materiales creados
 let materialesCreados = [];
 
+// Función para verificar si un material está siendo usado en tareas activas
+function verificarMaterialEnTareasActivas(nombreMaterial) {
+    try {
+        const tareasGuardadas = localStorage.getItem('tareasCreadas');
+        if (!tareasGuardadas) return null;
+        
+        const tareas = JSON.parse(tareasGuardadas);
+        const tareasActivas = [];
+        
+        tareas.forEach((item, index) => {
+            const tarea = item.tarea;
+            const estado = tarea.estado;
+            
+            // Verificar si la tarea está pendiente o en progreso
+            if (estado === 'pendiente' || estado === 'en progreso') {
+                // Verificar si el material está asignado a esta tarea
+                if (tarea.materiales && Array.isArray(tarea.materiales)) {
+                    const materialAsignado = tarea.materiales.find(mat => mat.nombreMaterial === nombreMaterial);
+                    if (materialAsignado) {
+                        tareasActivas.push({
+                            nombre: tarea.nombre,
+                            estado: estado,
+                            index: index
+                        });
+                    }
+                }
+            }
+        });
+        
+        return tareasActivas.length > 0 ? tareasActivas : null;
+    } catch (error) {
+        console.error('Error al verificar material en tareas:', error);
+        return null;
+    }
+}
+
+// Función para mostrar advertencia cuando un material está en tareas activas
+function mostrarAdvertenciaMaterialEnTareas(nombreMaterial, tareasActivas) {
+    const tareasList = tareasActivas.map(tarea => 
+        `• "${tarea.nombre}" (${tarea.estado})`
+    ).join('\n');
+    
+    const mensaje = `No se puede eliminar el material "${nombreMaterial}" porque está asignado a las siguientes tareas activas:\n\n${tareasList}\n\nPara poder eliminar este material, primero debe completar o cancelar estas tareas.`;
+    
+    // Actualizar el mensaje en el modal
+    document.getElementById('mensajeAdvertenciaMaterialEnTareas').textContent = mensaje;
+    
+    // Mostrar el modal de advertencia
+    document.getElementById('modalAdvertenciaMaterialEnTareas').style.display = 'block';
+}
+
+// Función para cerrar el modal de advertencia
+function cerrarModalAdvertenciaMaterialEnTareas() {
+    document.getElementById('modalAdvertenciaMaterialEnTareas').style.display = 'none';
+}
+
 // Funciones para persistencia de datos
 function guardarMaterialesEnStorage() {
     try {
@@ -52,14 +108,36 @@ function actualizarContadorMateriales() {
     document.getElementById('contadorMateriales').textContent = materialesCreados.length;
 }
 
+// Función para obtener el siguiente ID disponible
+function obtenerSiguienteIDMaterial() {
+    if (materialesCreados.length === 0) {
+        return 1;
+    }
+    
+    // Obtener todos los IDs existentes
+    const idsExistentes = materialesCreados.map(item => item.id).sort((a, b) => a - b);
+    
+    // Encontrar el primer ID faltante
+    let siguienteID = 1;
+    for (let id of idsExistentes) {
+        if (id !== siguienteID) {
+            break;
+        }
+        siguienteID++;
+    }
+    
+    return siguienteID;
+}
+
 // Función para agregar material a la lista
 function agregarMaterialALista(material) {
+    const siguienteID = obtenerSiguienteIDMaterial();
     materialesCreados.push({
         material: material,
         fechaCreacion: new Date(),
-        id: materialesCreados.length + 1
+        id: siguienteID
     });
-    console.log(`✅ Material agregado a la lista: ${material.getNombreMaterial()}`);
+    console.log(`✅ Material agregado a la lista: ${material.getNombreMaterial()} con ID: ${siguienteID}`);
     guardarMaterialesEnStorage(); // Guardar en localStorage
     actualizarContadorMateriales();
     actualizarListaMateriales(); // Actualizar automáticamente la lista en la página
@@ -71,7 +149,7 @@ function actualizarListaMateriales() {
     const listaDiv = document.getElementById('listaMateriales');
     
     if (materialesCreados.length === 0) {
-        estadisticasDiv.innerHTML = '<p class="empty-stats">📭 No hay materiales creados aún</p>';
+        estadisticasDiv.innerHTML = '<p class="empty-stats"> No hay materiales creados aún</p>';
         listaDiv.innerHTML = '<p class="empty-state">Crea tu primer material usando los botones de arriba</p>';
         return;
     }
@@ -82,7 +160,7 @@ function actualizarListaMateriales() {
     const totalInventario = materialesCreados.reduce((sum, item) => sum + item.material.getInventario(), 0);
     const valorTotalInventario = materialesCreados.reduce((sum, item) => sum + item.material.calcularValorTotal(), 0);
     
-    // Mostrar estadísticas
+    // Mostrar estadísticas con el formato correcto
     estadisticasDiv.innerHTML = `
         <h3 class="stats-title"><img src="../storage/vectors/stats-svgrepo-com.svg" alt="" class="stats-icon-large">Estadísticas Generales</h3>
         <div class="stats-grid">
@@ -95,49 +173,46 @@ function actualizarListaMateriales() {
                 <div class="stat-label">Promedio Costo/Unidad</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value warning">${totalInventario}</div>
+                <div class="stat-value purple">${totalInventario}</div>
                 <div class="stat-label">Total Unidades</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value purple">$${valorTotalInventario.toFixed(2)}</div>
+                <div class="stat-value warning">$${valorTotalInventario.toFixed(2)}</div>
                 <div class="stat-label">Valor Total Inventario</div>
             </div>
         </div>
     `;
     
-    // Mostrar lista de materiales
+    // Mostrar lista de materiales con el mismo formato que empleados
     let listaHTML = '<h3 class="employees-title"><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon-large">Lista Detallada</h3>';
     
     materialesCreados.forEach((item, index) => {
         const material = item.material;
-        const info = material.obtenerInformacion();
         const fechaFormateada = item.fechaCreacion.toLocaleString('es-ES');
         
         listaHTML += `
             <div class="employee-card">
                 <div class="employee-header">
-                    <h4 class="employee-name"><img src="../storage/vectors/user-list-svgrepo-com.svg" alt="" class="user-list-icon-large"> ${info.nombreMaterial}</h4>
+                    <h4 class="employee-name"><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon-large"> ${material.getNombreMaterial()}</h4>
                     <span class="employee-id">ID: ${item.id}</span>
                 </div>
                 
                 <div class="employee-details">
-                    <div class="employee-detail"><strong><img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> Costo/Unidad:</strong> $${info.costoPorUnidad.toFixed(2)}</div>
-                    <div class="employee-detail"><strong>📦 Inventario:</strong> ${info.inventario} unidades</div>
-                    <div class="employee-detail"><strong><img src="../storage/vectors/circle-dollar-svgrepo-com.svg" alt="" class="circle-dollar-icon"> Valor Total:</strong> $${info.valorTotal.toFixed(2)}</div>
-                    <div class="employee-detail">
-                        <button onclick="gestionarInventario(${index})" class="small-button" style="background: #28a745;">
-                            📦 Gestionar Stock
-                        </button>
-                    </div>
+                    <div class="employee-detail"><strong><img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> Costo/Unidad:</strong> $${material.getCostoPorUnidad().toFixed(2)}</div>
+                    <div class="employee-detail"><strong><img src="../storage/vectors/shapes-svgrepo-com.svg" alt="" class="briefcase-icon"> Inventario:</strong> ${material.getInventario()} unidades</div>
+                    <div class="employee-detail"><strong><img src="../storage/vectors/badge-dollar-svgrepo-com.svg" alt="" class="coins-icon"> Valor Total:</strong> $${material.calcularValorTotal().toFixed(2)}</div>
                 </div>
                 
                 <div class="employee-date">
-                    <img src="../storage/vectors/coins-svgrepo-com.svg" alt="" class="coins-icon"> Creado: ${fechaFormateada}
+                    <img src="../storage/vectors/clock-svgrepo-com.svg" alt="" class="clock-icon"> Creado: ${fechaFormateada}
                 </div>
                 
                 <div class="employee-actions">
-                    <button onclick="eliminarMaterial(${index})" class="small-button">
-                                                    <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="trash-icon">Eliminar
+                    <button onclick="gestionarInventario(${index})" class="button button-info">
+                        <img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="" class="button-icon">Gestionar Inventario
+                    </button>
+                    <button onclick="eliminarMaterial(${index})" class="button button-danger">
+                        <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="button-icon">Eliminar
                     </button>
                 </div>
             </div>
@@ -147,110 +222,207 @@ function actualizarListaMateriales() {
     listaDiv.innerHTML = listaHTML;
 }
 
+// Variable global para almacenar el índice del material seleccionado
+let materialSeleccionadoIndex = -1;
+
 // Función para gestionar el inventario de un material
 function gestionarInventario(index) {
+    materialSeleccionadoIndex = index;
     const material = materialesCreados[index].material;
-    const accion = prompt(`Gestionar inventario de "${material.getNombreMaterial()}" (Actual: ${material.getInventario()} unidades)\n\nEscribe:\n- Un número positivo para AGREGAR unidades\n- Un número negativo para QUITAR unidades\n- "0" para cancelar`);
     
-    if (accion === null || accion === "0") return;
+    // Mostrar información del material en el modal
+    document.getElementById('infoMaterialInventario').innerHTML = `
+        <h4>${material.getNombreMaterial()}</h4>
+        <div class="material-info-grid">
+            <div class="material-info-item">
+                <span class="material-info-label">Costo por Unidad:</span>
+                <span class="material-info-value">$${material.getCostoPorUnidad().toFixed(2)}</span>
+            </div>
+            <div class="material-info-item">
+                <span class="material-info-label">Inventario Actual:</span>
+                <span class="material-info-value ${material.getInventario() > 0 ? 'success' : 'warning'}">${material.getInventario()} unidades</span>
+            </div>
+            <div class="material-info-item">
+                <span class="material-info-label">Valor Total:</span>
+                <span class="material-info-value">$${material.calcularValorTotal().toFixed(2)}</span>
+            </div>
+        </div>
+    `;
     
-    const cantidad = parseFloat(accion);
+    // Limpiar formulario y abrir modal
+    limpiarFormularioInventario();
+    document.getElementById('modalGestionarInventario').style.display = 'block';
+}
+
+// Función para cerrar el modal de gestión de inventario
+function cerrarModalGestionarInventario() {
+    document.getElementById('modalGestionarInventario').style.display = 'none';
+    limpiarFormularioInventario();
+    materialSeleccionadoIndex = -1;
+}
+
+// Función para limpiar el formulario de inventario
+function limpiarFormularioInventario() {
+    document.getElementById('cantidadInventario').value = '';
+    document.getElementById('accionInventario').value = 'agregar';
+    document.getElementById('errorCantidadInventario').textContent = '';
+    document.getElementById('errorAccionInventario').textContent = '';
+}
+
+// Función para validar la cantidad de inventario
+function validarCantidadInventario(cantidad) {
+    if (cantidad === null || cantidad === "") {
+        return "La cantidad no puede estar vacía";
+    }
+    
     if (isNaN(cantidad)) {
-        alert("⚠️ Por favor ingresa un número válido");
+        return "La cantidad debe ser un número válido";
+    }
+    
+    if (cantidad <= 0) {
+        return "La cantidad debe ser mayor a 0";
+    }
+    
+    return null; // Sin errores
+}
+
+// Función para validar si se puede quitar la cantidad especificada
+function validarQuitarInventario(cantidad, inventarioActual) {
+    if (cantidad > inventarioActual) {
+        return `No hay suficiente inventario. Disponible: ${inventarioActual} unidades, Solicitado: ${cantidad} unidades`;
+    }
+    
+    return null; // Sin errores
+}
+
+// Función para aplicar el cambio de inventario
+function aplicarCambioInventario() {
+    if (materialSeleccionadoIndex === -1) {
         return;
     }
     
-    if (cantidad > 0) {
-        material.agregarInventario(cantidad);
-        alert(`✅ Se agregaron ${cantidad} unidades. Nuevo inventario: ${material.getInventario()}`);
-    } else if (cantidad < 0) {
-        const cantidadAQuitar = Math.abs(cantidad);
-        if (material.reducirInventario(cantidadAQuitar)) {
-            alert(`✅ Se quitaron ${cantidadAQuitar} unidades. Nuevo inventario: ${material.getInventario()}`);
-        } else {
-            alert(`❌ No hay suficiente inventario. Disponible: ${material.getInventario()}, Solicitado: ${cantidadAQuitar}`);
+    const cantidad = parseFloat(document.getElementById('cantidadInventario').value);
+    const accion = document.getElementById('accionInventario').value;
+    const material = materialesCreados[materialSeleccionadoIndex].material;
+    
+    // Validar cantidad
+    const errorCantidad = validarCantidadInventario(cantidad);
+    if (errorCantidad) {
+        document.getElementById('errorCantidadInventario').textContent = '❌ ' + errorCantidad;
+        return;
+    }
+    
+    document.getElementById('errorCantidadInventario').textContent = '✅ Cantidad válida';
+    
+    // Validar acción de quitar
+    if (accion === 'quitar') {
+        const errorQuitar = validarQuitarInventario(cantidad, material.getInventario());
+        if (errorQuitar) {
+            document.getElementById('errorAccionInventario').textContent = '❌ ' + errorQuitar;
+            return;
         }
     }
     
+    document.getElementById('errorAccionInventario').textContent = '✅ Acción válida';
+    
+    // Aplicar cambio directamente
+    if (accion === 'agregar') {
+        material.agregarInventario(cantidad);
+    } else if (accion === 'quitar') {
+        material.reducirInventario(cantidad);
+    }
+    
+    // Guardar cambios y actualizar interfaz
+    guardarMaterialesEnStorage();
     actualizarListaMateriales();
+    cerrarModalGestionarInventario();
 }
+
+// Variable global para almacenar el índice del material a eliminar
+let materialAEliminarIndex = -1;
 
 // Función para eliminar un material específico
 function eliminarMaterial(index) {
-    if (confirm(`¿Está seguro de que desea eliminar "${materialesCreados[index].material.getNombreMaterial()}"?`)) {
-        const nombreEliminado = materialesCreados[index].material.getNombreMaterial();
-        materialesCreados.splice(index, 1);
-        guardarMaterialesEnStorage(); // Guardar cambios en localStorage
-        console.log(`❌ Material eliminado: ${nombreEliminado}`);
-        actualizarListaMateriales();
-        actualizarContadorMateriales();
+    const nombreMaterial = materialesCreados[index].material.getNombreMaterial();
+    
+    // Verificar si el material está siendo usado en tareas activas
+    const tareasActivas = verificarMaterialEnTareasActivas(nombreMaterial);
+    
+    if (tareasActivas) {
+        // El material está siendo usado en tareas activas, mostrar advertencia
+        mostrarAdvertenciaMaterialEnTareas(nombreMaterial, tareasActivas);
+        return;
     }
+    
+    // Si no está siendo usado, proceder con la eliminación normal
+    materialAEliminarIndex = index;
+    document.getElementById('mensajeConfirmacionEliminarMaterial').textContent = 
+        `¿Está seguro de que desea eliminar "${nombreMaterial}"?`;
+    document.getElementById('modalConfirmacionEliminarMaterial').style.display = 'block';
+}
+
+// Función para cerrar el modal de confirmación de eliminación
+function cerrarModalConfirmacionEliminarMaterial() {
+    document.getElementById('modalConfirmacionEliminarMaterial').style.display = 'none';
+    materialAEliminarIndex = -1;
+}
+
+// Función para confirmar la eliminación del material
+function confirmarEliminacionMaterial() {
+    if (materialAEliminarIndex === -1) {
+        console.error('No hay material seleccionado para eliminar');
+        return;
+    }
+    
+    const nombreEliminado = materialesCreados[materialAEliminarIndex].material.getNombreMaterial();
+    materialesCreados.splice(materialAEliminarIndex, 1);
+    guardarMaterialesEnStorage(); // Guardar cambios en localStorage
+    console.log(`❌ Material eliminado: ${nombreEliminado}`);
+    actualizarListaMateriales();
+    actualizarContadorMateriales();
+    cerrarModalConfirmacionEliminarMaterial();
 }
 
 // Función para limpiar toda la lista
 function limpiarListaMateriales() {
     if (materialesCreados.length === 0) {
-        alert('📭 La lista ya está vacía');
+        console.log('📭 La lista ya está vacía');
         return;
     }
     
-    if (confirm(`¿Está seguro de que desea eliminar todos los ${materialesCreados.length} materiales?`)) {
-        materialesCreados = [];
-        guardarMaterialesEnStorage(); // Guardar cambios en localStorage
-        actualizarListaMateriales();
-        actualizarContadorMateriales();
-        console.log('Lista de materiales limpiada');
-    }
+    materialesCreados = [];
+    guardarMaterialesEnStorage(); // Guardar cambios en localStorage
+    actualizarListaMateriales();
+    actualizarContadorMateriales();
+    console.log('✅ Lista de materiales limpiada exitosamente');
 }
 
-// Función para exportar materiales a la consola
-function exportarMateriales() {
-    if (materialesCreados.length === 0) {
-        alert('📭 No hay materiales para exportar');
-        return;
-    }
-    
-    console.log('EXPORTACIÓN DE MATERIALES');
-    console.log('═'.repeat(50));
-    
-    materialesCreados.forEach((item, index) => {
-        const material = item.material;
-        const info = material.obtenerInformacion();
-        
-        console.log(`\nMATERIAL #${item.id}`);
-        console.log(`Nombre: ${info.nombreMaterial}`);
-        console.log(`Costo por unidad: $${info.costoPorUnidad.toFixed(2)}`);
-        console.log(`Inventario: ${info.inventario} unidades`);
-        console.log(`Valor total: $${info.valorTotal.toFixed(2)}`);
-        console.log(`Fecha creación: ${item.fechaCreacion.toLocaleString('es-ES')}`);
-        console.log('-'.repeat(30));
-    });
-    
-    // Estadísticas finales
-    const totalMateriales = materialesCreados.length;
-    const costoPromedio = materialesCreados.reduce((sum, item) => sum + item.material.getCostoPorUnidad(), 0) / totalMateriales;
-    const valorTotalInventario = materialesCreados.reduce((sum, item) => sum + item.material.calcularValorTotal(), 0);
-    
-    console.log(`\n📈 RESUMEN FINAL`);
-    console.log(`Total materiales: ${totalMateriales}`);
-    console.log(`Costo promedio/unidad: $${costoPromedio.toFixed(2)}`);
-    console.log(`Valor total inventario: $${valorTotalInventario.toFixed(2)}`);
-    
-    alert('📄 Materiales exportados a la consola. Abre las herramientas de desarrollador para verlos.');
-}
+
 
 // ===== GESTIÓN DE MODALES =====
 
 // Cerrar modal al hacer clic fuera de él
 window.onclick = function(event) {
     const modalCrearMaterial = document.getElementById('modalCrearMaterial');
+    const modalGestionarInventario = document.getElementById('modalGestionarInventario');
     const modalConfiguracion = document.getElementById('modalConfiguracion');
+    const modalConfirmacionEliminarMaterial = document.getElementById('modalConfirmacionEliminarMaterial');
+    const modalAdvertenciaMaterialEnTareas = document.getElementById('modalAdvertenciaMaterialEnTareas');
     
     if (event.target === modalCrearMaterial) {
         cerrarModalCrearMaterial();
     }
+    if (event.target === modalGestionarInventario) {
+        cerrarModalGestionarInventario();
+    }
     if (event.target === modalConfiguracion) {
         cerrarModalConfiguracion();
+    }
+    if (event.target === modalConfirmacionEliminarMaterial) {
+        cerrarModalConfirmacionEliminarMaterial();
+    }
+    if (event.target === modalAdvertenciaMaterialEnTareas) {
+        cerrarModalAdvertenciaMaterialEnTareas();
     }
 }
 
@@ -290,42 +462,7 @@ function obtenerRangos(tipoRango = 'costoPorUnidad') {
     return { minimo, maximo };
 }
 
-// Función para mostrar detalles de los rangos
-function mostrarRangosDetallados() {
-    const rangos = obtenerRangos();
-    if (!rangos) return;
-    
-    const detalles = `
-CONFIGURACIÓN ACTUAL DE RANGOS PARA MATERIALES
-═══════════════════════════════════════════════
 
-        <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> Rango de Costos Permitidos:
-   Mínimo: $${rangos.minimo.toFixed(2)}
-   Máximo: $${rangos.maximo.toFixed(2)}
-
-🎯 Aplicación:
-   ✓ Se aplica al costo por unidad
-   ✓ Validación automática en el modal
-   ✓ Inventario siempre comienza en 0
-   ✓ Gestión de stock disponible
-   ✓ Configuración global sincronizada
-
-⚠️ Reglas:
-   • Los valores deben estar dentro del rango
-   • Se solicita corrección si están fuera
-   • El inventario inicial es siempre 0
-   • Nombres sin caracteres especiales
-
-💡 Ejemplo de uso:
-   new Material("Cemento", ${rangos.minimo + 5}, 0);
-   // El inventario siempre comienza en 0
-
-🔧 Nota: Los rangos se pueden modificar desde el modal de Configuración global.
-    `;
-    
-    console.log(detalles);
-    alert("Detalles de rangos mostrados en la consola.\n💡 Usa el modal de Configuración para modificar rangos.");
-}
 
 // ===== MODAL DE CREAR MATERIAL =====
 
@@ -357,6 +494,10 @@ function limpiarFormularioMaterial() {
     // Limpiar mensajes de error
     document.getElementById('errorNombreMaterial').textContent = '';
     document.getElementById('errorCostoPorUnidad').textContent = '';
+    
+    // Limpiar clases CSS de validación
+    document.getElementById('nombreMaterial').classList.remove('valid', 'invalid');
+    document.getElementById('costoPorUnidad').classList.remove('valid', 'invalid');
 }
 
 // ===== VALIDACIÓN DE FORMULARIOS =====
@@ -416,9 +557,17 @@ function validarYCrearMaterial() {
         document.getElementById('errorCostoPorUnidad').textContent = '✅ Costo válido';
     }
     
-    // Si hay errores, no crear el material
+    // Si hay errores, mostrar indicador visual en lugar de alerta
     if (tieneErrores) {
-        alert('⚠️ Por favor corrija los errores antes de continuar');
+        // Agregar clase de error al modal
+        const modalContent = document.querySelector('#modalCrearMaterial .modal-content');
+        modalContent.classList.add('modal-error');
+        
+        // Remover la clase después de 3 segundos
+        setTimeout(() => {
+            modalContent.classList.remove('modal-error');
+        }, 3000);
+        
         return;
     }
     
@@ -541,7 +690,55 @@ function limpiarDatosSistema() {
 }
 
 function actualizarEstadisticasSistemaConfig() {
-    document.getElementById('estadisticasSistema').innerHTML = '<p>Estadísticas del sistema</p>';
+    const estadisticasDiv = document.getElementById('estadisticasSistema');
+    
+    // Calcular estadísticas del sistema
+    const totalMateriales = materialesCreados.length;
+    const costoPromedioUnidad = totalMateriales > 0 ? 
+        materialesCreados.reduce((sum, item) => sum + item.material.getCostoPorUnidad(), 0) / totalMateriales : 0;
+    const totalInventario = materialesCreados.reduce((sum, item) => sum + item.material.getInventario(), 0);
+    const valorTotalInventario = materialesCreados.reduce((sum, item) => sum + item.material.calcularValorTotal(), 0);
+    
+    estadisticasDiv.innerHTML = `
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="stat-icon-img">
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">${totalMateriales}</div>
+                    <div class="stat-label">Total Materiales</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="stat-icon-img">
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">$${costoPromedioUnidad.toFixed(2)}</div>
+                    <div class="stat-label">Promedio Costo/Unidad</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <img src="../storage/vectors/shapes-svgrepo-com.svg" alt="" class="stat-icon-img">
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">${totalInventario}</div>
+                    <div class="stat-label">Total Unidades</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <img src="../storage/vectors/coins-svgrepo-com.svg" alt="" class="stat-icon-img">
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">$${valorTotalInventario.toFixed(2)}</div>
+                    <div class="stat-label">Valor Total Inventario</div>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 // ===== INICIALIZACIÓN DEL SISTEMA =====
@@ -616,4 +813,101 @@ document.addEventListener('DOMContentLoaded', function() {
     
     document.getElementById('nombreMaterial').addEventListener('keypress', handleEnterKey);
     document.getElementById('costoPorUnidad').addEventListener('keypress', handleEnterKey);
+    
+    // ===== VALIDACIÓN EN TIEMPO REAL PARA INVENTARIO =====
+    
+    // Agregar validación en tiempo real al modal de gestión de inventario
+    document.getElementById('cantidadInventario').addEventListener('input', function() {
+        const cantidad = parseFloat(this.value);
+        const accion = document.getElementById('accionInventario').value;
+        const material = materialSeleccionadoIndex !== -1 ? materialesCreados[materialSeleccionadoIndex].material : null;
+        
+        const error = validarCantidadInventario(cantidad);
+        const errorElement = document.getElementById('errorCantidadInventario');
+        
+        if (this.value === '') {
+            errorElement.textContent = '';
+            this.classList.remove('valid', 'invalid');
+        } else if (error) {
+            errorElement.textContent = '❌ ' + error;
+            this.classList.remove('valid');
+            this.classList.add('invalid');
+        } else {
+            errorElement.textContent = '✅ Cantidad válida';
+            this.classList.remove('invalid');
+            this.classList.add('valid');
+            
+            // Validar acción de quitar si hay material seleccionado
+            if (material && accion === 'quitar') {
+                const errorQuitar = validarQuitarInventario(cantidad, material.getInventario());
+                const errorAccionElement = document.getElementById('errorAccionInventario');
+                
+                if (errorQuitar) {
+                    errorAccionElement.textContent = '❌ ' + errorQuitar;
+                } else {
+                    errorAccionElement.textContent = '✅ Acción válida';
+                }
+            }
+        }
+    });
+    
+    // Agregar validación en tiempo real al selector de acción
+    document.getElementById('accionInventario').addEventListener('change', function() {
+        const cantidad = parseFloat(document.getElementById('cantidadInventario').value);
+        const accion = this.value;
+        const material = materialSeleccionadoIndex !== -1 ? materialesCreados[materialSeleccionadoIndex].material : null;
+        
+        if (material && accion === 'quitar' && cantidad > 0) {
+            const errorQuitar = validarQuitarInventario(cantidad, material.getInventario());
+            const errorAccionElement = document.getElementById('errorAccionInventario');
+            
+            if (errorQuitar) {
+                errorAccionElement.textContent = '❌ ' + errorQuitar;
+            } else {
+                errorAccionElement.textContent = '✅ Acción válida';
+            }
+        } else {
+            document.getElementById('errorAccionInventario').textContent = '';
+        }
+    });
+    
+    // Permitir aplicar cambio con Enter en el campo de cantidad
+    document.getElementById('cantidadInventario').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            aplicarCambioInventario();
+        }
+    });
+    
+    // ===== CERRAR MODALES CON TECLA ESCAPE =====
+    
+    // Cerrar modales con tecla Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const modalCrearMaterial = document.getElementById('modalCrearMaterial');
+            const modalGestionarInventario = document.getElementById('modalGestionarInventario');
+            const modalConfiguracion = document.getElementById('modalConfiguracion');
+            const modalConfirmacionEliminarMaterial = document.getElementById('modalConfirmacionEliminarMaterial');
+            const modalAdvertenciaMaterialEnTareas = document.getElementById('modalAdvertenciaMaterialEnTareas');
+            
+            if (modalCrearMaterial.style.display === 'block') {
+                cerrarModalCrearMaterial();
+            }
+            
+            if (modalGestionarInventario.style.display === 'block') {
+                cerrarModalGestionarInventario();
+            }
+            
+            if (modalConfiguracion.style.display === 'block') {
+                cerrarModalConfiguracion();
+            }
+            
+            if (modalConfirmacionEliminarMaterial.style.display === 'block') {
+                cerrarModalConfirmacionEliminarMaterial();
+            }
+            
+            if (modalAdvertenciaMaterialEnTareas.style.display === 'block') {
+                cerrarModalAdvertenciaMaterialEnTareas();
+            }
+        }
+    });
 });

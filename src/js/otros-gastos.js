@@ -2,6 +2,65 @@
 // Array global para almacenar todos los otros gastos creados
 let otrosGastosCreados = [];
 
+// Función para verificar si un otro gasto está siendo usado en tareas activas
+function verificarOtroGastoEnTareasActivas(nombreOtroGasto) {
+    try {
+        const tareasGuardadas = localStorage.getItem('tareasCreadas');
+        if (!tareasGuardadas) return null;
+        
+        const tareas = JSON.parse(tareasGuardadas);
+        const tareasActivas = [];
+        
+        tareas.forEach((item, index) => {
+            const tarea = item.tarea;
+            const estado = tarea.estado;
+            
+            // Verificar si la tarea está pendiente o en progreso
+            if (estado === 'pendiente' || estado === 'en progreso') {
+                // Verificar si el otro gasto está asignado a esta tarea
+                if (tarea.otrosGastos && Array.isArray(tarea.otrosGastos)) {
+                    const otroGastoAsignado = tarea.otrosGastos.find(gasto => gasto.nombre === nombreOtroGasto);
+                    if (otroGastoAsignado) {
+                        tareasActivas.push({
+                            nombre: tarea.nombre,
+                            estado: estado,
+                            index: index
+                        });
+                    }
+                }
+            }
+        });
+        
+        return tareasActivas.length > 0 ? tareasActivas : null;
+    } catch (error) {
+        console.error('Error al verificar otro gasto en tareas:', error);
+        return null;
+    }
+}
+
+// Función para mostrar advertencia cuando un otro gasto está en tareas activas
+function mostrarAdvertenciaOtroGastoEnTareas(nombreOtroGasto, tareasActivas) {
+    const tareasList = tareasActivas.map(tarea => 
+        `• "${tarea.nombre}" (${tarea.estado})`
+    ).join('\n');
+    
+    const mensaje = `No se puede eliminar el gasto "${nombreOtroGasto}" porque está asignado a las siguientes tareas activas:\n\n${tareasList}\n\nPara poder eliminar este gasto, primero debe completar o cancelar estas tareas.`;
+    
+    // Actualizar el mensaje en el modal
+    document.getElementById('mensajeAdvertenciaOtroGastoEnTareas').textContent = mensaje;
+    
+    // Mostrar el modal de advertencia
+    document.getElementById('modalAdvertenciaOtroGastoEnTareas').style.display = 'block';
+}
+
+// Función para cerrar el modal de advertencia
+function cerrarModalAdvertenciaOtroGastoEnTareas() {
+    document.getElementById('modalAdvertenciaOtroGastoEnTareas').style.display = 'none';
+}
+
+// Variables para el modal de confirmación de eliminación
+let otroGastoAEliminarIndex = -1;
+
 // Funciones para persistencia de datos
 function guardarOtrosGastosEnStorage() {
     try {
@@ -19,16 +78,15 @@ function cargarOtrosGastosDesdeStorage() {
             const datosOtrosGastos = JSON.parse(otrosGastosGuardados);
             otrosGastosCreados = [];
             
-            // Recrear instancias de la clase OtrosCostos
+            // Recrear instancias de la clase OtrosGastos
             datosOtrosGastos.forEach(item => {
                 const otroGastoData = item.otroGasto;
-                // Recrear la instancia de OtrosCostos con los datos guardados
-                const otroGastoRecreado = new OtrosCostos(
+                // Recrear la instancia de OtrosGastos con los datos guardados
+                const otroGastoRecreado = new OtrosGastos(
                     otroGastoData.nombre,
-                    otroGastoData.costoPorUnidad
+                    otroGastoData.costoPorUnidad,
+                    otroGastoData.descripcion || ''
                 );
-                // Restaurar el inventario
-                otroGastoRecreado.inventario = otroGastoData.inventario;
                 
                 otrosGastosCreados.push({
                     otroGasto: otroGastoRecreado,
@@ -71,7 +129,7 @@ function actualizarListaOtrosGastos() {
     const listaDiv = document.getElementById('listaOtrosGastos');
     
     if (otrosGastosCreados.length === 0) {
-        estadisticasDiv.innerHTML = '<p class="empty-stats">📭 No hay otros gastos creados aún</p>';
+        estadisticasDiv.innerHTML = '<p class="empty-stats"> No hay otros gastos creados aún</p>';
         listaDiv.innerHTML = '<p class="empty-state">Crea tu primer otro gasto usando los botones de arriba</p>';
         return;
     }
@@ -81,7 +139,7 @@ function actualizarListaOtrosGastos() {
     const costoPromedioUnidad = otrosGastosCreados.reduce((sum, item) => sum + item.otroGasto.getCostoPorUnidad(), 0) / totalOtrosGastos;
     const costoTotalProyecto = otrosGastosCreados.reduce((sum, item) => sum + item.otroGasto.getCostoPorUnidad(), 0);
     
-    // Mostrar estadísticas
+    // Mostrar estadísticas con el formato correcto
     estadisticasDiv.innerHTML = `
         <h3 class="stats-title"><img src="../storage/vectors/stats-svgrepo-com.svg" alt="" class="stats-icon-large">Estadísticas Generales</h3>
         <div class="stats-grid">
@@ -91,142 +149,91 @@ function actualizarListaOtrosGastos() {
             </div>
             <div class="stat-card">
                 <div class="stat-value primary">$${costoPromedioUnidad.toFixed(2)}</div>
-                <div class="stat-label">Promedio Costo/Unidad</div>
+                <div class="stat-label">Promedio Costo</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value warning">$${costoTotalProyecto.toFixed(2)}</div>
+                <div class="stat-value purple">$${costoTotalProyecto.toFixed(2)}</div>
                 <div class="stat-label">Costo Total del Proyecto</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value purple"><img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="" class="briefcase-icon-stat"></div>
-                <div class="stat-label">Gastos Generales</div>
+                <div class="stat-value warning">${totalOtrosGastos}</div>
+                <div class="stat-label">Total Gastos Generales</div>
             </div>
         </div>
     `;
     
-    // Mostrar lista de otros gastos
-    let listaHTML = '<h3 class="employees-title"><img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="" class="briefcase-icon-large">Lista Detallada</h3>';
-    
-    otrosGastosCreados.forEach((item, index) => {
+    // Mostrar lista de otros gastos con formato horizontal
+    listaDiv.innerHTML = otrosGastosCreados.map((item, index) => {
         const otroGasto = item.otroGasto;
-        const info = otroGasto.obtenerInformacion();
-        const fechaFormateada = item.fechaCreacion.toLocaleString('es-ES');
+        const fecha = item.fechaCreacion.toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
         
-        listaHTML += `
-            <div class="employee-card">
-                <div class="employee-header">
-                    <h4 class="employee-name"><img src="../storage/vectors/user-list-svgrepo-com.svg" alt="" class="user-list-icon-large"> ${info.nombre}</h4>
-                    <span class="employee-id">ID: ${item.id}</span>
-                </div>
-                
-                <div class="employee-details">
-                    <div class="employee-detail"><strong><img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> Costo/Unidad:</strong> $${info.costoPorUnidad.toFixed(2)}</div>
-                    <div class="employee-detail"><strong>Tipo:</strong> Gasto General del Proyecto</div>
-                    <div class="employee-detail">
-                        <button onclick="calcularCostoPersonalizado(${index})" class="small-button" style="background: #17a2b8;">
-                            🧮 Calcular Costo
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="employee-date">
-                    <img src="../storage/vectors/coins-svgrepo-com.svg" alt="" class="coins-icon"> Creado: ${fechaFormateada}
-                </div>
-                
-                <div class="employee-actions">
-                    <button onclick="eliminarOtroGasto(${index})" class="small-button">
-                                                    <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="trash-icon">Eliminar
-                    </button>
-                </div>
-            </div>
-        `;
-    });
-    
-    listaDiv.innerHTML = listaHTML;
+                 return `
+             <div class="employee-card">
+                 <div class="employee-header">
+                     <h4 class="employee-name"><img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="" class="briefcase-icon-large"> ${otroGasto.getNombre()}</h4>
+                     <span class="employee-id">ID: ${item.id}</span>
+                 </div>
+                 
+                 <div class="employee-details">
+                     <div class="employee-detail"><strong><img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> Costo:</strong> $${otroGasto.getCostoPorUnidad().toFixed(2)}</div>
+                     ${otroGasto.getDescripcion() ? `
+                     <div class="employee-detail"><strong><img src="../storage/vectors/align-right-svgrepo-com.svg" alt="" class="align-right-icon"> Descripción:</strong> ${otroGasto.getDescripcion()}</div>
+                     ` : ''}
+                 </div>
+                 
+                 <div class="employee-date">
+                     <img src="../storage/vectors/coins-svgrepo-com.svg" alt="" class="coins-icon"> Creado: ${fecha}
+                 </div>
+                 
+                 <div class="employee-actions">
+                     <button onclick="eliminarOtroGasto(${index})" class="button button-danger">
+                         <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="button-icon">Eliminar
+                     </button>
+                 </div>
+             </div>
+         `;
+    }).join('');
 }
 
-// Función para calcular costo personalizado
-function calcularCostoPersonalizado(index) {
-    const otroGasto = otrosGastosCreados[index].otroGasto;
-    const cantidad = prompt(`Calcular costo total para "${otroGasto.getNombre()}" (Costo por unidad: $${otroGasto.getCostoPorUnidad().toFixed(2)})\n\nIngrese la cantidad de unidades:`);
-    
-    if (cantidad === null || cantidad === "0" || cantidad === "") return;
-    
-    const cantidadFloat = parseFloat(cantidad);
-    if (isNaN(cantidadFloat) || cantidadFloat <= 0) {
-        alert("⚠️ Por favor ingresa un número válido mayor a 0");
-        return;
-    }
-    
-    const costoTotal = otroGasto.calcularCostoTotal(cantidadFloat);
-            alert(`<img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> Cálculo de Costo:\n\n` +
-          `Gasto: ${otroGasto.getNombre()}\n` +
-          `Costo por unidad: $${otroGasto.getCostoPorUnidad().toFixed(2)}\n` +
-          `Cantidad: ${cantidadFloat} unidades\n` +
-          `Costo total: $${costoTotal.toFixed(2)}`);
-}
+
 
 // Función para eliminar un otro gasto específico
 function eliminarOtroGasto(index) {
-    if (confirm(`¿Está seguro de que desea eliminar "${otrosGastosCreados[index].otroGasto.getNombre()}"?`)) {
-        const nombreEliminado = otrosGastosCreados[index].otroGasto.getNombre();
-        otrosGastosCreados.splice(index, 1);
-        guardarOtrosGastosEnStorage(); // Guardar cambios en localStorage
-        console.log(`❌ Otro gasto eliminado: ${nombreEliminado}`);
-        actualizarListaOtrosGastos();
-        actualizarContadorOtrosGastos();
+    const nombreOtroGasto = otrosGastosCreados[index].otroGasto.getNombre();
+    
+    // Verificar si el otro gasto está siendo usado en tareas activas
+    const tareasActivas = verificarOtroGastoEnTareasActivas(nombreOtroGasto);
+    
+    if (tareasActivas) {
+        // El otro gasto está siendo usado en tareas activas, mostrar advertencia
+        mostrarAdvertenciaOtroGastoEnTareas(nombreOtroGasto, tareasActivas);
+        return;
     }
+    
+    // Si no está siendo usado, proceder con la eliminación normal
+    otroGastoAEliminarIndex = index;
+    
+    // Abrir el modal de confirmación
+    const modal = document.getElementById('modalConfirmacionEliminarOtroGasto');
+    modal.style.display = 'block';
 }
 
 // Función para limpiar toda la lista
 function limpiarListaOtrosGastos() {
-    if (otrosGastosCreados.length === 0) {
-        alert('📭 La lista ya está vacía');
-        return;
-    }
-    
-    if (confirm(`¿Está seguro de que desea eliminar todos los ${otrosGastosCreados.length} otros gastos?`)) {
-        otrosGastosCreados = [];
-        guardarOtrosGastosEnStorage(); // Guardar cambios en localStorage
-        actualizarListaOtrosGastos();
-        actualizarContadorOtrosGastos();
-        console.log('Lista de otros gastos limpiada');
-    }
+    otrosGastosCreados = [];
+    guardarOtrosGastosEnStorage(); // Guardar cambios en localStorage
+    actualizarListaOtrosGastos();
+    actualizarContadorOtrosGastos();
+    console.log('Lista de otros gastos limpiada');
 }
 
-// Función para exportar otros gastos a la consola
-function exportarOtrosGastos() {
-    if (otrosGastosCreados.length === 0) {
-        alert('📭 No hay otros gastos para exportar');
-        return;
-    }
-    
-    console.log('EXPORTACIÓN DE OTROS GASTOS');
-    console.log('═'.repeat(50));
-    
-    otrosGastosCreados.forEach((item, index) => {
-        const otroGasto = item.otroGasto;
-        const info = otroGasto.obtenerInformacion();
-        
-        console.log(`\nOTRO GASTO #${item.id}`);
-        console.log(`Nombre: ${info.nombre}`);
-        console.log(`Costo por unidad: $${info.costoPorUnidad.toFixed(2)}`);
-        console.log(`Fecha creación: ${item.fechaCreacion.toLocaleString('es-ES')}`);
-        console.log('-'.repeat(30));
-    });
-    
-    // Estadísticas finales
-    const totalOtrosGastos = otrosGastosCreados.length;
-    const costoPromedio = otrosGastosCreados.reduce((sum, item) => sum + item.otroGasto.getCostoPorUnidad(), 0) / totalOtrosGastos;
-    const costoTotalProyecto = otrosGastosCreados.reduce((sum, item) => sum + item.otroGasto.getCostoPorUnidad(), 0);
-    
-    console.log(`\n📈 RESUMEN FINAL`);
-    console.log(`Total otros gastos: ${totalOtrosGastos}`);
-    console.log(`Costo promedio/unidad: $${costoPromedio.toFixed(2)}`);
-    console.log(`Costo total proyecto: $${costoTotalProyecto.toFixed(2)}`);
-    
-    alert('📄 Otros gastos exportados a la consola. Abre las herramientas de desarrollador para verlos.');
-}
+
 
 // ===== GESTIÓN DE MODALES =====
 
@@ -234,12 +241,20 @@ function exportarOtrosGastos() {
 window.onclick = function(event) {
     const modalCrearOtroGasto = document.getElementById('modalCrearOtroGasto');
     const modalConfiguracion = document.getElementById('modalConfiguracion');
+    const modalConfirmacionEliminarOtroGasto = document.getElementById('modalConfirmacionEliminarOtroGasto');
+    const modalAdvertenciaOtroGastoEnTareas = document.getElementById('modalAdvertenciaOtroGastoEnTareas');
     
     if (event.target === modalCrearOtroGasto) {
         cerrarModalCrearOtroGasto();
     }
     if (event.target === modalConfiguracion) {
         cerrarModalConfiguracion();
+    }
+    if (event.target === modalConfirmacionEliminarOtroGasto) {
+        cerrarModalConfirmacionEliminarOtroGasto();
+    }
+    if (event.target === modalAdvertenciaOtroGastoEnTareas) {
+        cerrarModalAdvertenciaOtroGastoEnTareas();
     }
 }
 
@@ -279,41 +294,7 @@ function obtenerRangos(tipoRango = 'costoOtrosGastos') {
     return { minimo, maximo };
 }
 
-// Función para mostrar detalles de los rangos
-function mostrarRangosDetallados() {
-    const rangos = obtenerRangos();
-    if (!rangos) return;
-    
-    const detalles = `
-CONFIGURACIÓN ACTUAL DE RANGOS PARA OTROS GASTOS
-═══════════════════════════════════════════════
 
-        <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> Rango de Costos Permitidos:
-   Mínimo: $${rangos.minimo.toFixed(2)}
-   Máximo: $${rangos.maximo.toFixed(2)}
-
-🎯 Aplicación:
-   ✓ Se aplica al costo por unidad
-   ✓ Validación automática en el modal
-   ✓ Gastos generales del proyecto
-   ✓ Configuración global sincronizada
-
-⚠️ Reglas:
-   • Los valores deben estar dentro del rango
-   • Se solicita corrección si están fuera
-   • Representa gastos generales (servicios, otros)
-   • Nombres sin caracteres especiales
-
-💡 Ejemplo de uso:
-   new OtrosGastos("Servicios públicos", ${rangos.minimo + 10});
-   // Para gastos generales del proyecto
-
-🔧 Nota: Los rangos se pueden modificar desde el modal de Configuración global.
-    `;
-    
-    console.log(detalles);
-    alert("Detalles de rangos mostrados en la consola.\n💡 Usa el modal de Configuración para modificar rangos.");
-}
 
 // ===== MODAL DE CREAR OTRO GASTO =====
 
@@ -337,14 +318,42 @@ function cerrarModalCrearOtroGasto() {
     limpiarFormularioOtroGasto();
 }
 
+// ===== FUNCIONES PARA MODAL DE CONFIRMACIÓN DE ELIMINACIÓN =====
+
+function confirmarEliminarOtroGasto() {
+    if (otroGastoAEliminarIndex >= 0 && otroGastoAEliminarIndex < otrosGastosCreados.length) {
+        const otroGastoAEliminar = otrosGastosCreados[otroGastoAEliminarIndex].otroGasto;
+        const nombreEliminado = otroGastoAEliminar.getNombre();
+        
+        otrosGastosCreados.splice(otroGastoAEliminarIndex, 1);
+        guardarOtrosGastosEnStorage(); // Guardar cambios en localStorage
+        console.log(`❌ Otro gasto eliminado: ${nombreEliminado}`);
+        actualizarListaOtrosGastos();
+        actualizarContadorOtrosGastos();
+    }
+    
+    // Cerrar el modal y resetear el índice
+    cerrarModalConfirmacionEliminarOtroGasto();
+}
+
+function cerrarModalConfirmacionEliminarOtroGasto() {
+    document.getElementById('modalConfirmacionEliminarOtroGasto').style.display = 'none';
+    otroGastoAEliminarIndex = -1; // Resetear el índice
+}
+
 // Función para limpiar el formulario
 function limpiarFormularioOtroGasto() {
     document.getElementById('nombreOtroGasto').value = '';
     document.getElementById('costoPorUnidadOtroGasto').value = '';
+    document.getElementById('descripcionOtroGasto').value = '';
     
     // Limpiar mensajes de error
     document.getElementById('errorNombreOtroGasto').textContent = '';
     document.getElementById('errorCostoPorUnidadOtroGasto').textContent = '';
+    document.getElementById('errorDescripcionOtroGasto').textContent = '';
+    
+    // Actualizar contador de caracteres
+    document.querySelector('.char-counter').textContent = '0/80 caracteres';
 }
 
 // ===== VALIDACIÓN DE FORMULARIOS =====
@@ -379,10 +388,20 @@ function validarCosto(costo, tipo, tipoRango = 'costoOtrosGastos') {
     return null; // Sin errores
 }
 
+// Función para validar la descripción
+function validarDescripcion(descripcion) {
+    if (descripcion.length > 80) {
+        return "La descripción no puede exceder los 80 caracteres";
+    }
+    
+    return null; // Sin errores
+}
+
 // Función para validar y crear otro gasto
 function validarYCrearOtroGasto() {
     const nombre = document.getElementById('nombreOtroGasto').value;
     const costoPorUnidad = parseFloat(document.getElementById('costoPorUnidadOtroGasto').value);
+    const descripcion = document.getElementById('descripcionOtroGasto').value;
     
     let tieneErrores = false;
     
@@ -404,9 +423,36 @@ function validarYCrearOtroGasto() {
         document.getElementById('errorCostoPorUnidadOtroGasto').textContent = '✅ Costo válido';
     }
     
-    // Si hay errores, no crear el otro gasto
+    // Validar descripción
+    const errorDescripcion = validarDescripcion(descripcion);
+    if (errorDescripcion) {
+        document.getElementById('errorDescripcionOtroGasto').textContent = '❌ ' + errorDescripcion;
+        tieneErrores = true;
+    } else {
+        document.getElementById('errorDescripcionOtroGasto').textContent = descripcion ? '✅ Descripción válida' : '';
+    }
+    
+    // Si hay errores, mostrar indicador visual en lugar de alerta
     if (tieneErrores) {
-        alert('⚠️ Por favor corrija los errores antes de continuar');
+        // Agregar clase de error al modal
+        const modalContent = document.querySelector('#modalCrearOtroGasto .modal-content');
+        
+        if (modalContent) {
+            // Remover la clase si ya existe para forzar la animación
+            modalContent.classList.remove('modal-error');
+            
+            // Forzar un reflow para asegurar que la animación se ejecute
+            modalContent.offsetHeight;
+            
+            // Agregar la clase de error
+            modalContent.classList.add('modal-error');
+            
+            // Remover la clase después de 3 segundos
+            setTimeout(() => {
+                modalContent.classList.remove('modal-error');
+            }, 3000);
+        }
+        
         return;
     }
     
@@ -417,7 +463,7 @@ function validarYCrearOtroGasto() {
         console.log(`Rango: $${rangos.minimo} - $${rangos.maximo}`);
         console.log(`Datos ingresados: ${nombre}, $${costoPorUnidad}`);
         
-        const otroGasto = new OtrosGastos(nombre, costoPorUnidad);
+        const otroGasto = new OtrosGastos(nombre, costoPorUnidad, descripcion);
         
         console.log("✅ Otro gasto creado exitosamente:", otroGasto.toString());
         agregarOtroGastoALista(otroGasto);
@@ -449,6 +495,7 @@ function abrirModalConfiguracion() {
     cargarConfiguracionGlobal();
     document.getElementById('modalConfiguracion').style.display = 'block';
     actualizarInterfazConfiguracion();
+    actualizarEstadisticasSistemaConfig();
 }
 
 function cerrarModalConfiguracion() {
@@ -529,7 +576,27 @@ function limpiarDatosSistema() {
 }
 
 function actualizarEstadisticasSistemaConfig() {
-    document.getElementById('estadisticasSistema').innerHTML = '<p>Estadísticas del sistema</p>';
+    const totalOtrosGastos = otrosGastosCreados.length;
+    const costoPromedioUnidad = otrosGastosCreados.length > 0 ? 
+        otrosGastosCreados.reduce((sum, item) => sum + item.otroGasto.getCostoPorUnidad(), 0) / totalOtrosGastos : 0;
+    const costoTotalProyecto = otrosGastosCreados.reduce((sum, item) => sum + item.otroGasto.getCostoPorUnidad(), 0);
+    
+    document.getElementById('estadisticasSistema').innerHTML = `
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value success">${totalOtrosGastos}</div>
+                <div class="stat-label">Total Otros Gastos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value primary">$${costoPromedioUnidad.toFixed(2)}</div>
+                <div class="stat-label">Promedio Costo</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value purple">$${costoTotalProyecto.toFixed(2)}</div>
+                <div class="stat-label">Costo Total del Proyecto</div>
+            </div>
+        </div>
+    `;
 }
 
 // ===== INICIALIZACIÓN DEL SISTEMA =====
@@ -574,24 +641,58 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    document.getElementById('costoPorUnidadOtroGasto').addEventListener('input', function() {
-        const costo = parseFloat(this.value);
-        const error = validarCosto(costo, 'costo por unidad', 'costoOtrosGastos');
-        const errorElement = document.getElementById('errorCostoPorUnidadOtroGasto');
-        
-        if (this.value === '') {
-            errorElement.textContent = '';
-            this.classList.remove('valid', 'invalid');
-        } else if (error) {
-            errorElement.textContent = '❌ ' + error;
-            this.classList.remove('valid');
-            this.classList.add('invalid');
-        } else {
-            errorElement.textContent = '✅ Costo válido';
-            this.classList.remove('invalid');
-            this.classList.add('valid');
-        }
-    });
+         document.getElementById('costoPorUnidadOtroGasto').addEventListener('input', function() {
+         const costo = parseFloat(this.value);
+         const error = validarCosto(costo, 'costo por unidad', 'costoOtrosGastos');
+         const errorElement = document.getElementById('errorCostoPorUnidadOtroGasto');
+         
+         if (this.value === '') {
+             errorElement.textContent = '';
+             this.classList.remove('valid', 'invalid');
+         } else if (error) {
+             errorElement.textContent = '❌ ' + error;
+             this.classList.remove('valid');
+             this.classList.add('invalid');
+         } else {
+             errorElement.textContent = '✅ Costo válido';
+             this.classList.remove('invalid');
+             this.classList.add('valid');
+         }
+     });
+     
+     // Agregar validación en tiempo real para la descripción
+     document.getElementById('descripcionOtroGasto').addEventListener('input', function() {
+         const descripcion = this.value;
+         const error = validarDescripcion(descripcion);
+         const errorElement = document.getElementById('errorDescripcionOtroGasto');
+         const charCounter = document.querySelector('.char-counter');
+         
+         // Actualizar contador de caracteres
+         const charCount = descripcion.length;
+         charCounter.textContent = `${charCount}/80 caracteres`;
+         
+         // Cambiar color del contador según la longitud
+         charCounter.classList.remove('warning', 'danger');
+         if (charCount > 70) {
+             charCounter.classList.add('warning');
+         }
+         if (charCount > 75) {
+             charCounter.classList.add('danger');
+         }
+         
+         if (descripcion === '') {
+             errorElement.textContent = '';
+             this.classList.remove('valid', 'invalid');
+         } else if (error) {
+             errorElement.textContent = '❌ ' + error;
+             this.classList.remove('valid');
+             this.classList.add('invalid');
+         } else {
+             errorElement.textContent = '✅ Descripción válida';
+             this.classList.remove('invalid');
+             this.classList.add('valid');
+         }
+     });
     
     // ===== FUNCIONALIDAD DE TECLA ENTER =====
     
@@ -602,6 +703,35 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    document.getElementById('nombreOtroGasto').addEventListener('keypress', handleEnterKey);
-    document.getElementById('costoPorUnidadOtroGasto').addEventListener('keypress', handleEnterKey);
+         document.getElementById('nombreOtroGasto').addEventListener('keypress', handleEnterKey);
+     document.getElementById('costoPorUnidadOtroGasto').addEventListener('keypress', handleEnterKey);
+     document.getElementById('descripcionOtroGasto').addEventListener('keypress', handleEnterKey);
+     
+     // ===== CERRAR MODALES CON TECLA ESCAPE =====
+     
+     // Cerrar modales con tecla Escape
+     document.addEventListener('keydown', function(event) {
+         if (event.key === 'Escape') {
+             const modalCrearOtroGasto = document.getElementById('modalCrearOtroGasto');
+             const modalConfiguracion = document.getElementById('modalConfiguracion');
+             const modalConfirmacionEliminarOtroGasto = document.getElementById('modalConfirmacionEliminarOtroGasto');
+             const modalAdvertenciaOtroGastoEnTareas = document.getElementById('modalAdvertenciaOtroGastoEnTareas');
+             
+             if (modalCrearOtroGasto.style.display === 'block') {
+                 cerrarModalCrearOtroGasto();
+             }
+             
+             if (modalConfiguracion.style.display === 'block') {
+                 cerrarModalConfiguracion();
+             }
+             
+             if (modalConfirmacionEliminarOtroGasto.style.display === 'block') {
+                 cerrarModalConfirmacionEliminarOtroGasto();
+             }
+             
+             if (modalAdvertenciaOtroGastoEnTareas.style.display === 'block') {
+                 cerrarModalAdvertenciaOtroGastoEnTareas();
+             }
+         }
+     });
 });

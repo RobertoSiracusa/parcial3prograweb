@@ -6,10 +6,12 @@ class OtrosGastos {
      * Constructor de la clase OtrosGastos
      * @param {string} nombre - Nombre del gasto
      * @param {number} costoPorUnidad - Costo por unidad (float)
+     * @param {string} descripcion - Descripción del gasto (opcional, máximo 80 caracteres)
      */
-    constructor(nombre, costoPorUnidad) {
+    constructor(nombre, costoPorUnidad, descripcion = '') {
         this.nombre = this.validarNombre(nombre);
         this.costoPorUnidad = parseFloat(costoPorUnidad);
+        this.descripcion = this.validarDescripcion(descripcion);
     }
 
     /**
@@ -24,6 +26,19 @@ class OtrosGastos {
             throw new Error(`El nombre "${nombre}" contiene caracteres no permitidos. Caracteres prohibidos: !"·$%&/()=?¿'¡+\`*]^[´.:,;-_{}<>\`~\\|`);
         }
         return nombre;
+    }
+
+    /**
+     * Valida que la descripción no exceda los 80 caracteres
+     * @param {string} descripcion - Descripción a validar
+     * @returns {string} Descripción validada
+     * @throws {Error} Si la descripción excede los 80 caracteres
+     */
+    validarDescripcion(descripcion) {
+        if (descripcion.length > 80) {
+            throw new Error(`La descripción no puede exceder los 80 caracteres. Longitud actual: ${descripcion.length}`);
+        }
+        return descripcion;
     }
 
     /**
@@ -59,6 +74,22 @@ class OtrosGastos {
     }
 
     /**
+     * Getter para obtener la descripción
+     * @returns {string} Descripción del gasto
+     */
+    getDescripcion() {
+        return this.descripcion;
+    }
+
+    /**
+     * Setter para establecer la descripción
+     * @param {string} descripcion - Nueva descripción del gasto
+     */
+    setDescripcion(descripcion) {
+        this.descripcion = this.validarDescripcion(descripcion);
+    }
+
+    /**
      * Calcula el costo total para una cantidad específica
      * @param {number} cantidad - Cantidad de unidades
      * @returns {number} Costo total (cantidad × costo por unidad)
@@ -72,8 +103,14 @@ class OtrosGastos {
      * @returns {string} Información del gasto
      */
     toString() {
-        return `Otros Gastos: ${this.nombre}
+        let info = `Otros Gastos: ${this.nombre}
         Costo por unidad: $${this.costoPorUnidad.toFixed(2)}`;
+        
+        if (this.descripcion) {
+            info += `\n        Descripción: ${this.descripcion}`;
+        }
+        
+        return info;
     }
 
     /**
@@ -83,7 +120,8 @@ class OtrosGastos {
     obtenerInformacion() {
         return {
             nombre: this.nombre,
-            costoPorUnidad: this.costoPorUnidad
+            costoPorUnidad: this.costoPorUnidad,
+            descripcion: this.descripcion
         };
     }
 }

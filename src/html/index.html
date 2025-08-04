@@ -3,167 +3,319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Proyectos</title>
+    <title>Control de Proyectos - Dashboard</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="home-container">
-        <!-- Navegación -->
-        <nav class="nav-bar">
-                            <span class="nav-current"><img src="../storage/vectors/home-svgrepo-com.svg" alt="" class="home-icon">Inicio</span>
-            <span class="nav-separator">|</span>
-                            <a href="empleados.html" class="nav-link"><img src="../storage/vectors/user-svgrepo-com.svg" alt="" class="user-icon">Empleados</a>
-            <span class="nav-separator">|</span>
-                            <a href="materiales.html" class="nav-link"><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon">Materiales</a>
-            <span class="nav-separator">|</span>
-                            <a href="otros-gastos.html" class="nav-link"><img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="" class="briefcase-icon">Otros Gastos</a>
-            <span class="nav-separator">|</span>
-                            <a href="tareas.html" class="nav-link"><img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon">Tareas</a>
-            <span class="nav-separator">|</span>
-                            <a href="#" onclick="abrirModalConfiguracion()" class="nav-link"><img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="settings-icon">Configuración</a>
-        </nav>
-
-        <!-- Hero Section -->
-        <div class="hero-section">
-                            <h1 class="hero-title"><img src="../storage/vectors/browser-svgrepo-com.svg" alt="" class="browser-icon"> Control de Proyectos</h1>
-            <p class="hero-subtitle">Gestión Avanzada de Tareas, Empleados y Recursos</p>
-            
-        </div>
-
-        <!-- Features Grid -->
-        <div class="features-grid">
-            <a href="empleados.html" class="feature-card clickable">
-                <div class="feature-icon"><img src="../storage/vectors/user-svgrepo-com.svg" alt="" class="user-icon-feature"></div>
-                <h3>Gestión de Empleados</h3>
-                <p>Crea, edita y gestiona empleados.</p>
-            </a>
-            
-            <a href="materiales.html" class="feature-card clickable">
-                <div class="feature-icon"><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon-feature"></div>
-                <h3>Gestión de Materiales</h3>
-                <p>Administra inventario, costos y stock de materiales.</p>
-            </a>
-            
-            <a href="otros-gastos.html" class="feature-card clickable">
-                <div class="feature-icon"><img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="" class="briefcase-icon-feature"></div>
-                <h3>Otros Gastos</h3>
-                <p>Gestiona gastos generales y costos adicionales del proyecto.</p>
-            </a>
-            
-            <a href="tareas.html" class="feature-card clickable">
-                <div class="feature-icon"><img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon-feature"></div>
-                <h3>Tareas</h3>
-                <p>Organiza tareas asignando personal, materiales y recursos necesarios.</p>
-            </a>
-            
-            <div class="feature-card clickable" onclick="abrirModalConfiguracion()">
-                <div class="feature-icon"><img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="settings-icon-feature"></div>
-                <h3>Configuración</h3>
-                <p>Personaliza rangos, validación e interfaz del sistema.</p>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <img src="../storage/vectors/browser-svgrepo-com.svg" alt="Logo" class="logo-icon">
+                    <span class="logo-text">Panel de Control</span>
+                </div>
             </div>
             
-            <div class="feature-card">
-                <div class="feature-icon"><img src="../storage/vectors/stats-svgrepo-com.svg" alt="" class="stats-icon-feature"></div>
-                <h3>Estadísticas en Tiempo Real</h3>
-                <p>Visualiza estadísticas y métricas de tu personal al instante.</p>
-            </div>
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item active">
+                        <a href="#" class="nav-link">
+                            <img src="../storage/vectors/home-svgrepo-com.svg" alt="Inicio" class="nav-icon">
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="empleados.html" class="nav-link">
+                            <img src="../storage/vectors/user-svgrepo-com.svg" alt="Empleados" class="nav-icon">
+                            <span class="nav-text">Empleados</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="materiales.html" class="nav-link">
+                            <img src="../storage/vectors/layers-svgrepo-com.svg" alt="Materiales" class="nav-icon">
+                            <span class="nav-text">Materiales</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="otros-gastos.html" class="nav-link">
+                            <img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="Otros Gastos" class="nav-icon">
+                            <span class="nav-text">Otros Gastos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="tareas.html" class="nav-link">
+                            <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="Tareas" class="nav-icon">
+                            <span class="nav-text">Tareas</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
             
+            <div class="sidebar-footer">
+                <button onclick="abrirModalConfiguracion()" class="nav-link settings-link">
+                    <img src="../storage/vectors/settings-svgrepo-com.svg" alt="Configuración" class="nav-icon">
+                    <span class="nav-text">Configuración</span>
+                </button>
+            </div>
+        </aside>
 
-        </div>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-left">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Bienvenido al sistema de control de proyectos</p>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <img src="../storage/vectors/portrait-user-svgrepo-com.svg" alt="Usuario" class="user-avatar">
+                        <span class="user-name">Administrador</span>
+                    </div>
+                </div>
+            </header>
 
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Stats Cards -->
+                <div class="stats-section">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <img src="../storage/vectors/user-svgrepo-com.svg" alt="Empleados" class="stat-icon-img">
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-number" id="totalEmpleados">0</h3>
+                                <p class="stat-label">Empleados</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <img src="../storage/vectors/layers-svgrepo-com.svg" alt="Materiales" class="stat-icon-img">
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-number" id="totalMateriales">0</h3>
+                                <p class="stat-label">Materiales</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="Tareas" class="stat-icon-img">
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-number" id="totalTareas">0</h3>
+                                <p class="stat-label">Tareas</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <img src="../storage/vectors/coins-svgrepo-com.svg" alt="Gastos" class="stat-icon-img">
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-number" id="totalGastos">$0</h3>
+                                <p class="stat-label">Total Gastos</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Quick Actions -->
+                <div class="quick-actions-section">
+                    <h2 class="section-title">Acciones Rápidas</h2>
+                    <div class="quick-actions-grid">
+                        <a href="empleados.html" class="quick-action-card">
+                            <div class="action-icon">
+                                <img src="../storage/vectors/user-svgrepo-com.svg" alt="Empleados" class="action-icon-img">
+                            </div>
+                            <h3>Gestionar Empleados</h3>
+                            <p>Crear, editar y administrar empleados del proyecto</p>
+                        </a>
+                        
+                        <a href="materiales.html" class="quick-action-card">
+                            <div class="action-icon">
+                                <img src="../storage/vectors/layers-svgrepo-com.svg" alt="Materiales" class="action-icon-img">
+                            </div>
+                            <h3>Gestionar Materiales</h3>
+                            <p>Administrar inventario y costos de materiales</p>
+                        </a>
+                        
+                        <a href="tareas.html" class="quick-action-card">
+                            <div class="action-icon">
+                                <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="Tareas" class="action-icon-img">
+                            </div>
+                            <h3>Gestionar Tareas</h3>
+                            <p>Organizar y asignar tareas del proyecto</p>
+                        </a>
+                        
+                        <a href="otros-gastos.html" class="quick-action-card">
+                            <div class="action-icon">
+                                <img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="Gastos" class="action-icon-img">
+                            </div>
+                            <h3>Otros Gastos</h3>
+                            <p>Registrar gastos adicionales del proyecto</p>
+                        </a>
+                    </div>
+                </div>
 
-        <!-- Footer -->
-        <footer class="footer">
-            <p>© 2024 Sistema de Personal - Desarrollado con JavaScript</p>
-        </footer>
+                <!-- Recent Activity -->
+                <div class="recent-activity-section">
+                    <h2 class="section-title">Actividad Reciente</h2>
+                    <div class="activity-list" id="activityList">
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <img src="../storage/vectors/clock-svgrepo-com.svg" alt="Actividad" class="activity-icon-img">
+                            </div>
+                            <div class="activity-content">
+                                <p class="activity-text">Sistema iniciado correctamente</p>
+                                <span class="activity-time">Hace unos momentos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
-
-        <!-- Modal de Configuración -->
-        <div id="modalConfiguracion" class="modal">
-            <div class="modal-content config-modal">
-                <div class="modal-header">
-                    <h2 class="modal-title"><img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="settings-icon-large">Configuración Global del Sistema</h2>
-                    <button onclick="cerrarModalConfiguracion()" class="modal-close">×</button>
+    <!-- Modal de Configuración -->
+    <div id="modalConfiguracion" class="modal">
+        <div class="modal-content config-modal">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="settings-icon-large">
+                    Configuración del Sistema
+                </h2>
+                <button onclick="cerrarModalConfiguracion()" class="modal-close">×</button>
+            </div>
+            
+            <div class="modal-body config-content">
+                <div class="config-panel">
+                    <h2>
+                        <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon">
+                        Configuración de Rangos por Defecto
+                    </h2>
+                    <p>Define los rangos globales que se aplicarán en todo el sistema para validar costos y precios.</p>
+                    
+                    <div class="config-grid">
+                        <div class="input-group">
+                            <label for="rangoMinimoGlobal">
+                                <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> 
+                                Costo Mínimo Global ($)
+                            </label>
+                            <input type="number" id="rangoMinimoGlobal" value="1" step="0.01" placeholder="0.00">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="rangoMaximoGlobal">
+                                <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> 
+                                Costo Máximo Global ($)
+                            </label>
+                            <input type="number" id="rangoMaximoGlobal" value="1000" step="0.01" placeholder="0.00">
+                        </div>
+                    </div>
+                    
+                    <div class="range-display-container">
+                        <span id="rangoGlobalActual" class="range-display">
+                            Rango global: $1.00 - $1000.00
+                        </span>
+                    </div>
+                    
+                    <button onclick="aplicarConfiguracionGlobal()" class="button button-success">
+                        <img src="../storage/vectors/check-svgrepo-com.svg" alt="" class="button-icon">
+                        Aplicar Configuración Global
+                    </button>
                 </div>
-                
-                <div class="modal-body config-content">
-                    <div class="config-panel">
-                        <h2>🎯 Configuración de Rangos por Defecto</h2>
-                        <p>Define los rangos globales que se aplicarán en todo el sistema:</p>
-                        
-                        <div class="config-grid">
-                            <div class="input-group">
-                                <label for="rangoMinimoGlobal"><img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> Costo Mínimo Global ($):</label>
-                                <input type="number" id="rangoMinimoGlobal" value="1" step="0.01">
-                            </div>
-                            
-                            <div class="input-group">
-                                <label for="rangoMaximoGlobal"><img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> Costo Máximo Global ($):</label>
-                                <input type="number" id="rangoMaximoGlobal" value="1000" step="0.01">
-                            </div>
+
+                <div class="config-panel">
+                    <h2>
+                        <img src="../storage/vectors/shield-svgrepo-com.svg" alt="" class="shield-icon">
+                        Configuración de Validación
+                    </h2>
+                    <p>Personaliza las reglas de validación y la experiencia del usuario en el sistema.</p>
+                    
+                    <div class="config-grid">
+                        <div class="input-group">
+                            <label for="validacionEstricta">
+                                <img src="../storage/vectors/lock-svgrepo-com.svg" alt="" class="lock-icon">
+                                Validación Estricta de Nombres
+                            </label>
+                            <select id="validacionEstricta">
+                                <option value="true">Activada (Recomendado)</option>
+                                <option value="false">Desactivada</option>
+                            </select>
                         </div>
                         
-                        <div class="range-display-container">
-                            <span id="rangoGlobalActual" class="range-display">
-                                Rango global: $1.00 - $1000.00
-                            </span>
+                        <div class="input-group">
+                            <label for="mostrarConsejos">
+                                <img src="../storage/vectors/lightbulb-svgrepo-com.svg" alt="" class="lightbulb-icon">
+                                Mostrar Consejos de Ayuda
+                            </label>
+                            <select id="mostrarConsejos">
+                                <option value="true">Sí (Recomendado)</option>
+                                <option value="false">No</option>
+                            </select>
                         </div>
+                    </div>
+                    
+                    <button onclick="aplicarConfiguracionValidacion()" class="button button-info">
+                        <img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="button-icon">
+                        Aplicar Configuración de Validación
+                    </button>
+                </div>
+
+                <div class="config-panel">
+                    <h2>
+                        <img src="../storage/vectors/database-svgrepo-com.svg" alt="" class="database-icon">
+                        Gestión de Datos
+                    </h2>
+                    <p>Administra la configuración del sistema y los datos almacenados.</p>
+                    
+                    <div class="buttons-section">
+                        <button onclick="exportarConfiguracion()" class="button button-success">
+                            <img src="../storage/vectors/download-svgrepo-com.svg" alt="" class="button-icon">
+                            Exportar Configuración
+                        </button>
                         
-                        <button onclick="aplicarConfiguracionGlobal()" class="button button-success">
-                            ✅ Aplicar Configuración Global
+                        <button onclick="resetearConfiguracion()" class="button button-warning">
+                            <img src="../storage/vectors/refresh-svgrepo-com.svg" alt="" class="button-icon">
+                            Restaurar Por Defecto
+                        </button>
+                        
+                        <button onclick="limpiarDatosSistema()" class="button button-danger">
+                            <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="button-icon">
+                            Limpiar Todos los Datos
                         </button>
                     </div>
+                </div>
 
-                    <div class="config-panel">
-                        <h2>🔧 Configuración de Validación</h2>
-                        
-                        <div class="config-grid">
-                            <div class="input-group">
-                                <label for="validacionEstricta">🔒 Validación Estricta de Nombres:</label>
-                                <select id="validacionEstricta">
-                                    <option value="true">Activada (Recomendado)</option>
-                                    <option value="false">Desactivada</option>
-                                </select>
+                <div class="config-panel">
+                    <h2>
+                        <img src="../storage/vectors/stats-svgrepo-com.svg" alt="" class="stats-icon">
+                        Estadísticas del Sistema
+                    </h2>
+                    <p>Información detallada sobre el uso y estado del sistema.</p>
+                    <div id="estadisticasSistema" class="stats-panel">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value primary" id="totalEmpleadosConfig">0</div>
+                                <div class="stat-label">Empleados Registrados</div>
                             </div>
-                            
-                            <div class="input-group">
-                                <label for="mostrarConsejos">💡 Mostrar Consejos de Ayuda:</label>
-                                <select id="mostrarConsejos">
-                                    <option value="true">Sí (Recomendado)</option>
-                                    <option value="false">No</option>
-                                </select>
+                            <div class="stat-card">
+                                <div class="stat-value purple" id="totalMaterialesConfig">0</div>
+                                <div class="stat-label">Materiales en Inventario</div>
                             </div>
-                        </div>
-                        
-                        <button onclick="aplicarConfiguracionValidacion()" class="button button-info">
-                            🔧 Aplicar Configuración de Validación
-                        </button>
-                    </div>
-
-                    <div class="config-panel">
-                        <h2>💾 Configuración de Datos</h2>
-                        
-                        <div class="buttons-section">
-                            <button onclick="exportarConfiguracion()" class="button button-success">
-                                📤 Exportar Configuración
-                            </button>
-                            
-                            <button onclick="resetearConfiguracion()" class="button button-warning">
-                                🔄 Restaurar Por Defecto
-                            </button>
-                            
-                            <button onclick="limpiarDatosSistema()" class="button button-danger">
-                                <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="trash-icon">Limpiar Todos los Datos
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="config-panel">
-                        <h2>📈 Estadísticas del Sistema</h2>
-                        <div id="estadisticasSistema" class="stats-panel">
-                            <!-- Estadísticas se llenarán aquí -->
+                            <div class="stat-card">
+                                <div class="stat-value success" id="totalTareasConfig">0</div>
+                                <div class="stat-label">Tareas Activas</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value warning" id="totalGastosConfig">$0</div>
+                                <div class="stat-label">Total de Gastos</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -192,6 +344,7 @@
             cargarConfiguracionGlobal();
             document.getElementById('modalConfiguracion').style.display = 'block';
             actualizarInterfazConfiguracion();
+            actualizarEstadisticasSistemaConfig();
         }
 
         function cerrarModalConfiguracion() {
@@ -265,13 +418,45 @@
         }
 
         function actualizarEstadisticasSistemaConfig() {
-            document.getElementById('estadisticasSistema').innerHTML = '<p>Estadísticas del sistema</p>';
+            // Cargar estadísticas desde localStorage
+            const empleados = JSON.parse(localStorage.getItem('empleados')) || [];
+            const materiales = JSON.parse(localStorage.getItem('materiales')) || [];
+            const tareas = JSON.parse(localStorage.getItem('tareas')) || [];
+            const otrosGastos = JSON.parse(localStorage.getItem('otrosGastos')) || [];
+            
+            // Actualizar contadores en el modal
+            document.getElementById('totalEmpleadosConfig').textContent = empleados.length;
+            document.getElementById('totalMaterialesConfig').textContent = materiales.length;
+            document.getElementById('totalTareasConfig').textContent = tareas.length;
+            
+            // Calcular total de gastos
+            const totalGastos = otrosGastos.reduce((total, gasto) => total + parseFloat(gasto.costo || 0), 0);
+            document.getElementById('totalGastosConfig').textContent = `$${totalGastos.toFixed(2)}`;
         }
 
-        // Mensaje de bienvenida en consola
-                    console.log("Página de Inicio - Sistema de Personal");
-        console.log("📚 Sistema de gestión completo desarrollado en JavaScript");
-        console.log("🚀 Navega a 'Gestionar Empleados' para comenzar");
+        // ===== FUNCIONES DEL DASHBOARD =====
+        function cargarEstadisticasDashboard() {
+            // Cargar estadísticas desde localStorage
+            const empleados = JSON.parse(localStorage.getItem('empleados')) || [];
+            const materiales = JSON.parse(localStorage.getItem('materiales')) || [];
+            const tareas = JSON.parse(localStorage.getItem('tareas')) || [];
+            const otrosGastos = JSON.parse(localStorage.getItem('otrosGastos')) || [];
+            
+            // Actualizar contadores
+            document.getElementById('totalEmpleados').textContent = empleados.length;
+            document.getElementById('totalMateriales').textContent = materiales.length;
+            document.getElementById('totalTareas').textContent = tareas.length;
+            
+            // Calcular total de gastos
+            const totalGastos = otrosGastos.reduce((total, gasto) => total + parseFloat(gasto.costo || 0), 0);
+            document.getElementById('totalGastos').textContent = `$${totalGastos.toFixed(2)}`;
+        }
+
+        // Inicializar dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarEstadisticasDashboard();
+            console.log("Dashboard inicializado - Sistema de Control de Proyectos");
+        });
     </script>
 </body>
 </html>

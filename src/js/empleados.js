@@ -2,6 +2,62 @@
 // Array global para almacenar todos los empleados creados
 let empleadosCreados = [];
 
+// Función para verificar si un empleado está siendo usado en tareas activas
+function verificarEmpleadoEnTareasActivas(nombreEmpleado) {
+    try {
+        const tareasGuardadas = localStorage.getItem('tareasCreadas');
+        if (!tareasGuardadas) return null;
+        
+        const tareas = JSON.parse(tareasGuardadas);
+        const tareasActivas = [];
+        
+        tareas.forEach((item, index) => {
+            const tarea = item.tarea;
+            const estado = tarea.estado;
+            
+            // Verificar si la tarea está pendiente o en progreso
+            if (estado === 'pendiente' || estado === 'en progreso') {
+                // Verificar si el empleado está asignado a esta tarea
+                if (tarea.personal && Array.isArray(tarea.personal)) {
+                    const empleadoAsignado = tarea.personal.find(emp => emp.nombre === nombreEmpleado);
+                    if (empleadoAsignado) {
+                        tareasActivas.push({
+                            nombre: tarea.nombre,
+                            estado: estado,
+                            index: index
+                        });
+                    }
+                }
+            }
+        });
+        
+        return tareasActivas.length > 0 ? tareasActivas : null;
+    } catch (error) {
+        console.error('Error al verificar empleado en tareas:', error);
+        return null;
+    }
+}
+
+// Función para mostrar advertencia cuando un empleado está en tareas activas
+function mostrarAdvertenciaEmpleadoEnTareas(nombreEmpleado, tareasActivas) {
+    const tareasList = tareasActivas.map(tarea => 
+        `• "${tarea.nombre}" (${tarea.estado})`
+    ).join('\n');
+    
+    const mensaje = `No se puede eliminar al empleado "${nombreEmpleado}" porque está asignado a las siguientes tareas activas:\n\n${tareasList}\n\nPara poder eliminar este empleado, primero debe completar o cancelar estas tareas.`;
+    
+    // Actualizar el mensaje en el modal
+    document.getElementById('mensajeAdvertenciaEmpleadoEnTareas').textContent = mensaje;
+    
+    // Mostrar el modal de advertencia
+    document.getElementById('modalAdvertenciaEmpleadoEnTareas').style.display = 'block';
+}
+
+// Función para cerrar el modal de advertencia
+function cerrarModalAdvertenciaEmpleadoEnTareas() {
+    document.getElementById('modalAdvertenciaEmpleadoEnTareas').style.display = 'none';
+}
+
 // Funciones para persistencia de datos
 function guardarEmpleadosEnStorage() {
     try {
@@ -53,14 +109,36 @@ function actualizarContadorEmpleados() {
     document.getElementById('contadorEmpleados').textContent = empleadosCreados.length;
 }
 
+// Función para obtener el siguiente ID disponible
+function obtenerSiguienteID() {
+    if (empleadosCreados.length === 0) {
+        return 1;
+    }
+    
+    // Obtener todos los IDs existentes
+    const idsExistentes = empleadosCreados.map(item => item.id).sort((a, b) => a - b);
+    
+    // Encontrar el primer ID faltante
+    let siguienteID = 1;
+    for (let id of idsExistentes) {
+        if (id !== siguienteID) {
+            break;
+        }
+        siguienteID++;
+    }
+    
+    return siguienteID;
+}
+
 // Función para agregar empleado a la lista
 function agregarEmpleadoALista(empleado) {
+    const siguienteID = obtenerSiguienteID();
     empleadosCreados.push({
         empleado: empleado,
         fechaCreacion: new Date(),
-        id: empleadosCreados.length + 1
+        id: siguienteID
     });
-    console.log(`✅ Empleado agregado a la lista: ${empleado.getNombre()}`);
+    console.log(` Empleado agregado a la lista: ${empleado.getNombre()} con ID: ${siguienteID}`);
     guardarEmpleadosEnStorage(); // Guardar en localStorage
     actualizarContadorEmpleados();
     actualizarListaEmpleados(); // Actualizar automáticamente la lista en la página
@@ -72,7 +150,7 @@ function actualizarListaEmpleados() {
     const listaDiv = document.getElementById('listaEmpleados');
     
     if (empleadosCreados.length === 0) {
-        estadisticasDiv.innerHTML = '<p class="empty-stats">📭 No hay empleados creados aún</p>';
+        estadisticasDiv.innerHTML = '<p class="empty-stats"> No hay empleados creados aún</p>';
         listaDiv.innerHTML = '<p class="empty-state">Crea tu primer empleado usando los botones de arriba</p>';
         return;
     }
@@ -133,8 +211,8 @@ function actualizarListaEmpleados() {
                 </div>
                 
                 <div class="employee-actions">
-                    <button onclick="eliminarEmpleado(${index})" class="small-button">
-                                                    <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="trash-icon">Eliminar
+                    <button onclick="eliminarEmpleado(${index})" class="button button-danger">
+                        <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="button-icon">Eliminar
                     </button>
                 </div>
             </div>
@@ -145,69 +223,69 @@ function actualizarListaEmpleados() {
 }
 
 // Función para eliminar un empleado específico
+// Variable global para almacenar el índice del empleado a eliminar
+let empleadoAEliminarIndex = -1;
+
 function eliminarEmpleado(index) {
-    if (confirm(`¿Está seguro de que desea eliminar a ${empleadosCreados[index].empleado.getNombre()}?`)) {
-        const nombreEliminado = empleadosCreados[index].empleado.getNombre();
-        empleadosCreados.splice(index, 1);
-        guardarEmpleadosEnStorage(); // Guardar cambios en localStorage
-        console.log(`❌ Empleado eliminado: ${nombreEliminado}`);
-        actualizarListaEmpleados();
-        actualizarContadorEmpleados();
+    const nombreEmpleado = empleadosCreados[index].empleado.getNombre();
+    
+    // Verificar si el empleado está siendo usado en tareas activas
+    const tareasActivas = verificarEmpleadoEnTareasActivas(nombreEmpleado);
+    
+    if (tareasActivas) {
+        // El empleado está siendo usado en tareas activas, mostrar advertencia
+        mostrarAdvertenciaEmpleadoEnTareas(nombreEmpleado, tareasActivas);
+        return;
     }
+    
+    // Si no está siendo usado, proceder con la eliminación normal
+    empleadoAEliminarIndex = index;
+    
+    // Actualizar el mensaje de confirmación
+    document.getElementById('mensajeConfirmacionEliminar').textContent = 
+        `¿Está seguro de que desea eliminar a ${nombreEmpleado}?`;
+    
+    // Mostrar el modal de confirmación
+    document.getElementById('modalConfirmacionEliminar').style.display = 'block';
+}
+
+function cerrarModalConfirmacionEliminar() {
+    document.getElementById('modalConfirmacionEliminar').style.display = 'none';
+    empleadoAEliminarIndex = -1;
+}
+
+function confirmarEliminacionEmpleado() {
+    if (empleadoAEliminarIndex === -1) {
+        console.error('No hay empleado seleccionado para eliminar');
+        return;
+    }
+    
+    const nombreEliminado = empleadosCreados[empleadoAEliminarIndex].empleado.getNombre();
+    empleadosCreados.splice(empleadoAEliminarIndex, 1);
+    guardarEmpleadosEnStorage(); // Guardar cambios en localStorage
+    console.log(`❌ Empleado eliminado: ${nombreEliminado}`);
+    actualizarListaEmpleados();
+    actualizarContadorEmpleados();
+    
+    // Cerrar el modal
+    cerrarModalConfirmacionEliminar();
 }
 
 // Función para limpiar toda la lista
 function limpiarListaEmpleados() {
     if (empleadosCreados.length === 0) {
-        alert('📭 La lista ya está vacía');
+        console.log('📭 La lista ya está vacía');
         return;
     }
     
-    if (confirm(`¿Está seguro de que desea eliminar todos los ${empleadosCreados.length} empleados?`)) {
-        empleadosCreados = [];
-        guardarEmpleadosEnStorage(); // Guardar cambios en localStorage
-        actualizarListaEmpleados();
-        actualizarContadorEmpleados();
-        console.log('Lista de empleados limpiada');
-    }
+    empleadosCreados = [];
+    guardarEmpleadosEnStorage(); // Guardar cambios en localStorage
+    actualizarListaEmpleados();
+    actualizarContadorEmpleados();
+    console.log('✅ Lista de empleados limpiada exitosamente');
 }
 
-// Función para exportar empleados a la consola
-function exportarEmpleados() {
-    if (empleadosCreados.length === 0) {
-        alert('📭 No hay empleados para exportar');
-        return;
-    }
-    
-    console.log('EXPORTACIÓN DE EMPLEADOS');
-    console.log('═'.repeat(50));
-    
-    empleadosCreados.forEach((item, index) => {
-        const empleado = item.empleado;
-        const info = empleado.obtenerInformacion();
-        
-        console.log(`\nEMPLEADO #${item.id}`);
-        console.log(`Nombre: ${info.nombre}`);
-        console.log(`Costo por hora: $${info.costoPorHora.toFixed(2)}`);
-        console.log(`Costo hora extra: $${info.costoPorHoraExtra.toFixed(2)}`);
-        console.log(`Horas trabajadas: ${info.horasTrabajadas}`);
-        console.log(`Salario total: $${info.salarioTotal.toFixed(2)}`);
-        console.log(`Fecha creación: ${item.fechaCreacion.toLocaleString('es-ES')}`);
-        console.log('-'.repeat(30));
-    });
-    
-    // Estadísticas finales
-    const totalEmpleados = empleadosCreados.length;
-    const costoPromedio = empleadosCreados.reduce((sum, item) => sum + item.empleado.getCostoPorHora(), 0) / totalEmpleados;
-    const nominaTotal = empleadosCreados.reduce((sum, item) => sum + item.empleado.calcularSalarioTotal(), 0);
-    
-    console.log(`\n📈 RESUMEN FINAL`);
-    console.log(`Total empleados: ${totalEmpleados}`);
-    console.log(`Costo promedio/hora: $${costoPromedio.toFixed(2)}`);
-    console.log(`Nómina total: $${nominaTotal.toFixed(2)}`);
-    
-    alert('📄 Empleados exportados a la consola. Abre las herramientas de desarrollador para verlos.');
-}
+
 
 // ===== GESTIÓN DE MODALES =====
 
@@ -215,12 +293,20 @@ function exportarEmpleados() {
 window.onclick = function(event) {
     const modalCrearEmpleado = document.getElementById('modalCrearEmpleado');
     const modalConfiguracion = document.getElementById('modalConfiguracion');
+    const modalConfirmacionEliminar = document.getElementById('modalConfirmacionEliminar');
+    const modalAdvertenciaEmpleadoEnTareas = document.getElementById('modalAdvertenciaEmpleadoEnTareas');
     
     if (event.target === modalCrearEmpleado) {
         cerrarModalCrearEmpleado();
     }
     if (event.target === modalConfiguracion) {
         cerrarModalConfiguracion();
+    }
+    if (event.target === modalConfirmacionEliminar) {
+        cerrarModalConfirmacionEliminar();
+    }
+    if (event.target === modalAdvertenciaEmpleadoEnTareas) {
+        cerrarModalAdvertenciaEmpleadoEnTareas();
     }
 }
 
@@ -260,43 +346,7 @@ function obtenerRangos(tipoRango = 'costoPorHora') {
     return { minimo, maximo };
 }
 
-// Función para mostrar detalles de los rangos
-function mostrarRangosDetallados() {
-    const rangos = obtenerRangos();
-    if (!rangos) return;
-    
-    const detalles = `
-CONFIGURACIÓN ACTUAL DE RANGOS PARA EMPLEADOS
-═══════════════════════════════════════════════
 
-        <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon"> Rango de Costos Permitidos:
-   Mínimo: $${rangos.minimo.toFixed(2)}
-   Máximo: $${rangos.maximo.toFixed(2)}
-
-🎯 Aplicación:
-   ✓ Se aplica al costo por hora
-   ✓ Se aplica al costo por hora extra
-   ✓ Validación automática en el constructor
-   ✓ Bucle hasta obtener valores válidos
-   ✓ Horas trabajadas siempre comienzan en 0
-   ✓ Configuración global sincronizada
-
-⚠️ Reglas:
-   • Los valores deben estar dentro del rango
-   • Se solicita corrección si están fuera
-   • No se puede crear empleado con costos inválidos
-   • Las horas trabajadas no se solicitan al usuario
-
-💡 Ejemplo de uso:
-   new Personal("Juan", ${rangos.minimo + 5}, ${rangos.maximo - 5}, ${rangos.minimo}, ${rangos.maximo});
-   // Las horas trabajadas siempre comienzan en 0
-
-🔧 Nota: Los rangos se pueden modificar desde el modal de Configuración global.
-    `;
-    
-    console.log(detalles);
-    alert("Detalles de rangos mostrados en la consola.\n💡 Usa el modal de Configuración para modificar rangos.");
-}
 
 // ===== MODAL DE CREAR EMPLEADO =====
 
@@ -332,6 +382,11 @@ function limpiarFormularioEmpleado() {
     document.getElementById('errorNombre').textContent = '';
     document.getElementById('errorCostoHora').textContent = '';
     document.getElementById('errorCostoHoraExtra').textContent = '';
+    
+    // Limpiar clases CSS de validación
+    document.getElementById('nombreEmpleado').classList.remove('valid', 'invalid');
+    document.getElementById('costoPorHora').classList.remove('valid', 'invalid');
+    document.getElementById('costoPorHoraExtra').classList.remove('valid', 'invalid');
 }
 
 // ===== VALIDACIÓN DE FORMULARIOS =====
@@ -342,9 +397,10 @@ function validarNombreEmpleado(nombre) {
         return "El nombre no puede estar vacío";
     }
     
-    const caracteresProhibidos = /[!"·$%&/()=?¿'¡+`*\]^\[´.:,;\-_{}<>`~\\|]/;
-    if (caracteresProhibidos.test(nombre)) {
-        return "El nombre contiene caracteres no permitidos";
+    // Validar que solo contenga letras y espacios
+    const soloLetrasYEspacios = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+    if (!soloLetrasYEspacios.test(nombre)) {
+        return "El nombre solo puede contener letras y espacios";
     }
     
     return null; // Sin errores
@@ -401,9 +457,27 @@ function validarYCrearEmpleado() {
         document.getElementById('errorCostoHoraExtra').textContent = '✅ Costo válido';
     }
     
-    // Si hay errores, no crear el empleado
+    // Si hay errores, mostrar indicador visual en lugar de alerta
     if (tieneErrores) {
-        alert('⚠️ Por favor corrija los errores antes de continuar');
+        // Agregar clase de error al modal
+        const modalContent = document.querySelector('#modalCrearEmpleado .modal-content');
+        
+        if (modalContent) {
+            // Remover la clase si ya existe para forzar la animación
+            modalContent.classList.remove('modal-error');
+            
+            // Forzar un reflow para asegurar que la animación se ejecute
+            modalContent.offsetHeight;
+            
+            // Agregar la clase de error
+            modalContent.classList.add('modal-error');
+            
+            // Remover la clase después de 3 segundos
+            setTimeout(() => {
+                modalContent.classList.remove('modal-error');
+            }, 3000);
+        }
+        
         return;
     }
     
@@ -648,4 +722,32 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('nombreEmpleado').addEventListener('keypress', handleEnterKey);
     document.getElementById('costoPorHora').addEventListener('keypress', handleEnterKey);
     document.getElementById('costoPorHoraExtra').addEventListener('keypress', handleEnterKey);
+    
+    // ===== CERRAR MODALES CON TECLA ESCAPE =====
+    
+    // Cerrar modales con tecla Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const modalCrearEmpleado = document.getElementById('modalCrearEmpleado');
+            const modalConfiguracion = document.getElementById('modalConfiguracion');
+            const modalConfirmacionEliminar = document.getElementById('modalConfirmacionEliminar');
+            const modalAdvertenciaEmpleadoEnTareas = document.getElementById('modalAdvertenciaEmpleadoEnTareas');
+            
+            if (modalCrearEmpleado.style.display === 'block') {
+                cerrarModalCrearEmpleado();
+            }
+            
+            if (modalConfiguracion.style.display === 'block') {
+                cerrarModalConfiguracion();
+            }
+            
+            if (modalConfirmacionEliminar.style.display === 'block') {
+                cerrarModalConfirmacionEliminar();
+            }
+            
+            if (modalAdvertenciaEmpleadoEnTareas.style.display === 'block') {
+                cerrarModalAdvertenciaEmpleadoEnTareas();
+            }
+        }
+    });
 });

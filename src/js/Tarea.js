@@ -1,11 +1,11 @@
 // ===== CLASE TAREA =====
 // Clase para representar una tarea del proyecto
 class Tarea {
-    constructor(nombre, personal = null, material = null, otrosGastos = null, duracion = 0) {
+    constructor(nombre, personal = null, materiales = null, otrosGastos = null, duracion = 0) {
         this.nombre = this._validarNombre(nombre);
-        this.personal = personal; // Instancia de Personal o null
-        this.material = material; // Instancia de Material o null
-        this.otrosGastos = otrosGastos; // Instancia de OtrosCostos o null
+        this.personal = Array.isArray(personal) ? personal : (personal ? [personal] : []); // Array de instancias de Personal
+        this.materiales = Array.isArray(materiales) ? materiales : (materiales ? [materiales] : []); // Array de instancias de Material
+        this.otrosGastos = Array.isArray(otrosGastos) ? otrosGastos : (otrosGastos ? [otrosGastos] : []); // Array de instancias de OtrosCostos
         this.duracion = this._validarDuracion(duracion); // En horas
         this.fechaCreacion = new Date();
         this.estado = 'pendiente'; // pendiente, en_progreso, completada
@@ -51,11 +51,27 @@ class Tarea {
         return this.personal;
     }
 
+    getPersonalArray() {
+        return this.personal;
+    }
+
+    getPrimerPersonal() {
+        return this.personal.length > 0 ? this.personal[0] : null;
+    }
+
     getMaterial() {
-        return this.material;
+        return this.materiales.length > 0 ? this.materiales[0] : null; // Para compatibilidad
+    }
+
+    getMateriales() {
+        return this.materiales;
     }
 
     getOtrosGastos() {
+        return this.otrosGastos.length > 0 ? this.otrosGastos[0] : null; // Para compatibilidad
+    }
+
+    getOtrosGastosArray() {
         return this.otrosGastos;
     }
 
@@ -73,15 +89,53 @@ class Tarea {
 
     // Setters
     setPersonal(personal) {
-        this.personal = personal;
+        this.personal = Array.isArray(personal) ? personal : (personal ? [personal] : []);
+    }
+
+    agregarPersonal(personal) {
+        if (personal && !this.personal.find(p => p.getNombre() === personal.getNombre())) {
+            this.personal.push(personal);
+        }
+    }
+
+    removerPersonal(nombrePersonal) {
+        this.personal = this.personal.filter(p => p.getNombre() !== nombrePersonal);
     }
 
     setMaterial(material) {
-        this.material = material;
+        this.materiales = Array.isArray(material) ? material : (material ? [material] : []); // Para compatibilidad
+    }
+
+    setMateriales(materiales) {
+        this.materiales = Array.isArray(materiales) ? materiales : (materiales ? [materiales] : []);
+    }
+
+    agregarMaterial(material) {
+        if (material && !this.materiales.find(m => m.getNombreMaterial() === material.getNombreMaterial())) {
+            this.materiales.push(material);
+        }
+    }
+
+    removerMaterial(nombreMaterial) {
+        this.materiales = this.materiales.filter(m => m.getNombreMaterial() !== nombreMaterial);
     }
 
     setOtrosGastos(otrosGastos) {
-        this.otrosGastos = otrosGastos;
+        this.otrosGastos = Array.isArray(otrosGastos) ? otrosGastos : (otrosGastos ? [otrosGastos] : []); // Para compatibilidad
+    }
+
+    setOtrosGastosArray(otrosGastos) {
+        this.otrosGastos = Array.isArray(otrosGastos) ? otrosGastos : (otrosGastos ? [otrosGastos] : []);
+    }
+
+    agregarOtroGasto(otroGasto) {
+        if (otroGasto && !this.otrosGastos.find(g => g.getNombre() === otroGasto.getNombre())) {
+            this.otrosGastos.push(otroGasto);
+        }
+    }
+
+    removerOtroGasto(nombreGasto) {
+        this.otrosGastos = this.otrosGastos.filter(g => g.getNombre() !== nombreGasto);
     }
 
     setDuracion(duracion) {
@@ -101,23 +155,35 @@ class Tarea {
         let costoTotal = 0;
 
         // Costo del personal (si está asignado)
-        if (this.personal) {
-            const costoPersonal = this.personal.calcularCostoPorHoras(this.duracion);
-            costoTotal += costoPersonal;
+        if (this.personal && this.personal.length > 0) {
+            // Dividir la duración entre todos los empleados
+            const duracionPorEmpleado = this.duracion / this.personal.length;
+            this.personal.forEach(empleado => {
+                const costoPersonal = empleado.calcularCostoPorHoras(duracionPorEmpleado);
+                costoTotal += costoPersonal;
+            });
         }
 
-        // Costo del material (si está asignado)
-        if (this.material) {
-            // Asumimos que se usa 1 unidad del material por defecto
-            const costoMaterial = this.material.getCostoPorUnidad();
-            costoTotal += costoMaterial;
+        // Costo de los materiales (si están asignados)
+        if (this.materiales && this.materiales.length > 0) {
+            this.materiales.forEach(material => {
+                // Calcular cantidad necesaria basada en la duración de la tarea
+                // Asumimos que se necesita 1 unidad por cada 4 horas de trabajo
+                const cantidadNecesaria = Math.ceil(this.duracion / 4);
+                const costoMaterial = material.getCostoPorUnidad() * cantidadNecesaria;
+                costoTotal += costoMaterial;
+            });
         }
 
-        // Otros gastos (si están asignados)
-        if (this.otrosGastos) {
-            // Asumimos que se usa 1 unidad por defecto
-            const costoOtros = this.otrosGastos.getCostoPorUnidad();
-            costoTotal += costoOtros;
+        // Costo de otros gastos (si están asignados)
+        if (this.otrosGastos && this.otrosGastos.length > 0) {
+            this.otrosGastos.forEach(gasto => {
+                // Calcular cantidad necesaria basada en la duración de la tarea
+                // Asumimos que se necesita 1 unidad por cada 8 horas de trabajo
+                const cantidadNecesaria = Math.ceil(this.duracion / 8);
+                const costoGasto = gasto.getCostoPorUnidad() * cantidadNecesaria;
+                costoTotal += costoGasto;
+            });
         }
 
         return costoTotal;
@@ -125,7 +191,7 @@ class Tarea {
 
     // Método para obtener desglose detallado del costo del personal (con días múltiples)
     obtenerDesgloseCostoPersonal() {
-        if (!this.personal) {
+        if (!this.personal || this.personal.length === 0) {
             return {
                 horasTotal: 0,
                 diasCompletos: 0,
@@ -135,7 +201,9 @@ class Tarea {
             };
         }
 
-        return this.personal.obtenerDesgloseCostoPorHoras(this.duracion);
+        // Si hay múltiples empleados, dividir la duración
+        const duracionPorEmpleado = this.duracion / this.personal.length;
+        return this.personal[0].obtenerDesgloseCostoPorHoras(duracionPorEmpleado);
     }
 
     // Método para obtener resumen de la tarea
@@ -145,9 +213,12 @@ class Tarea {
             duracion: this.duracion,
             estado: this.estado,
             costoTotal: this.calcularCostoTotal(),
-            tienePersonal: this.personal !== null,
-            tieneMaterial: this.material !== null,
-            tieneOtrosGastos: this.otrosGastos !== null,
+            tienePersonal: this.personal.length > 0,
+            tieneMateriales: this.materiales.length > 0,
+            tieneOtrosGastos: this.otrosGastos.length > 0,
+            cantidadPersonal: this.personal.length,
+            cantidadMateriales: this.materiales.length,
+            cantidadOtrosGastos: this.otrosGastos.length,
             fechaCreacion: this.fechaCreacion
         };
     }
@@ -159,44 +230,41 @@ class Tarea {
         detalles += `Estado: ${this.estado}\n`;
         detalles += `Fecha de creación: ${this.fechaCreacion.toLocaleDateString()}\n\n`;
 
-        if (this.personal) {
-            const desglose = this.obtenerDesgloseCostoPersonal();
-            detalles += `Personal asignado: ${this.personal.getNombre()}\n`;
-            detalles += `  • Duración total: ${desglose.horasTotal}h\n`;
-            
-            if (desglose.diasCompletos > 0) {
-                detalles += `  • Días completos: ${desglose.diasCompletos} (12h cada uno)\n`;
-            }
-            if (desglose.horasRestantes > 0) {
-                detalles += `  • Horas restantes: ${desglose.horasRestantes}h\n`;
-            }
-            detalles += `\n`;
-            
-            // Mostrar desglose por día
-            desglose.desgloseDias.forEach(dia => {
-                detalles += `  <img src="../storage/vectors/coins-svgrepo-com.svg" alt="" class="coins-icon"> Día ${dia.dia}:\n`;
-                detalles += `    <img src="../storage/vectors/alarm-exclamation-svgrepo-com.svg" alt="" class="alarm-exclamation-icon"> ${dia.horasNormales}h normales × $${this.personal.getCostoPorHora().toFixed(2)}/h = $${dia.costoHorasNormales.toFixed(2)}\n`;
-                if (dia.horasExtra > 0) {
-                    detalles += `    <img src="../storage/vectors/alarm-exclamation-svgrepo-com.svg" alt="" class="alarm-exclamation-icon"> ${dia.horasExtra}h extra × $${this.personal.getCostoPorHoraExtra().toFixed(2)}/h = $${dia.costoHorasExtra.toFixed(2)}\n`;
-                }
-                detalles += `    Subtotal día ${dia.dia}: $${dia.costoTotalDia.toFixed(2)}\n\n`;
+        if (this.personal && this.personal.length > 0) {
+            detalles += `Personal asignado: ${this.personal.length} empleado(s)\n`;
+            this.personal.forEach((empleado, index) => {
+                const duracionPorEmpleado = this.duracion / this.personal.length;
+                const desglose = empleado.obtenerDesgloseCostoPorHoras(duracionPorEmpleado);
+                detalles += `  ${index + 1}. ${empleado.getNombre()} (${duracionPorEmpleado.toFixed(1)}h)\n`;
+                detalles += `    • Costo: $${desglose.costoTotal.toFixed(2)}\n`;
             });
-            
-            detalles += `  • Costo total personal: $${desglose.costoTotal.toFixed(2)}\n`;
+            detalles += `\n`;
         } else {
             detalles += `Personal: No asignado\n`;
         }
 
-        if (this.material) {
-            detalles += `Material: ${this.material.getNombreMaterial()}\n`;
-            detalles += `Costo material: $${this.material.getCostoPorUnidad().toFixed(2)}\n`;
+        if (this.materiales && this.materiales.length > 0) {
+            detalles += `Materiales asignados: ${this.materiales.length} material(es)\n`;
+            this.materiales.forEach((material, index) => {
+                const cantidadNecesaria = Math.ceil(this.duracion / 4);
+                const costoMaterial = material.getCostoPorUnidad() * cantidadNecesaria;
+                detalles += `  ${index + 1}. ${material.getNombreMaterial()} (${cantidadNecesaria} unidades)\n`;
+                detalles += `    • Costo: $${costoMaterial.toFixed(2)}\n`;
+            });
+            detalles += `\n`;
         } else {
-            detalles += `Material: No asignado\n`;
+            detalles += `Materiales: No asignados\n`;
         }
 
-        if (this.otrosGastos) {
-            detalles += `Otros gastos: ${this.otrosGastos.getNombre()}\n`;
-            detalles += `Costo otros gastos: $${this.otrosGastos.getCostoPorUnidad().toFixed(2)}\n`;
+        if (this.otrosGastos && this.otrosGastos.length > 0) {
+            detalles += `Otros gastos asignados: ${this.otrosGastos.length} gasto(s)\n`;
+            this.otrosGastos.forEach((gasto, index) => {
+                const cantidadNecesaria = Math.ceil(this.duracion / 8);
+                const costoGasto = gasto.getCostoPorUnidad() * cantidadNecesaria;
+                detalles += `  ${index + 1}. ${gasto.getNombre()} (${cantidadNecesaria} unidades)\n`;
+                detalles += `    • Costo: $${costoGasto.toFixed(2)}\n`;
+            });
+            detalles += `\n`;
         } else {
             detalles += `Otros gastos: No asignados\n`;
         }

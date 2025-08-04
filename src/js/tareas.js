@@ -2,6 +2,9 @@
 // Array global para almacenar todas las tareas creadas
 let tareasCreadas = [];
 
+// Variables para el modal de confirmación de eliminación
+let tareaAEliminarIndex = -1;
+
 // Funciones para persistencia de datos
 function guardarTareasEnStorage() {
     try {
@@ -24,42 +27,68 @@ function cargarTareasDesdeStorage() {
                 const tareaData = item.tarea;
                 
                 // Recrear personal si existe
-                let personalRecreado = null;
+                let personalRecreado = [];
                 if (tareaData.personal) {
-                    personalRecreado = new Personal(
-                        tareaData.personal.nombre,
-                        tareaData.personal.costoPorHora,
-                        tareaData.personal.costoPorHoraExtra
-                    );
-                    personalRecreado.horasTrabajadas = tareaData.personal.horasTrabajadas;
+                    // Manejar tanto el formato anterior (objeto único) como el nuevo (array)
+                    const personalData = Array.isArray(tareaData.personal) ? tareaData.personal : [tareaData.personal];
+                    
+                    personalData.forEach(empData => {
+                        const empleado = new Personal(
+                            empData.nombre,
+                            empData.costoPorHora,
+                            empData.costoPorHoraExtra
+                        );
+                        empleado.horasTrabajadas = empData.horasTrabajadas;
+                        personalRecreado.push(empleado);
+                    });
                 }
                 
-                // Recrear material si existe
-                let materialRecreado = null;
-                if (tareaData.material) {
-                    materialRecreado = new Material(
+                // Recrear materiales si existen
+                let materialesRecreados = [];
+                if (tareaData.materiales) {
+                    // Manejar tanto el formato anterior (objeto único) como el nuevo (array)
+                    const materialesData = Array.isArray(tareaData.materiales) ? tareaData.materiales : [tareaData.materiales];
+                    
+                    materialesData.forEach(materialData => {
+                        const material = new Material(
+                            materialData.nombreMaterial,
+                            materialData.costoPorUnidad
+                        );
+                        material.inventario = materialData.inventario;
+                        materialesRecreados.push(material);
+                    });
+                } else if (tareaData.material) {
+                    // Compatibilidad con formato anterior
+                    const material = new Material(
                         tareaData.material.nombreMaterial,
                         tareaData.material.costoPorUnidad
                     );
-                    materialRecreado.inventario = tareaData.material.inventario;
+                    material.inventario = tareaData.material.inventario;
+                    materialesRecreados.push(material);
                 }
                 
-                // Recrear otros gastos si existe
-                let otrosGastosRecreado = null;
+                // Recrear otros gastos si existen
+                let otrosGastosRecreados = [];
                 if (tareaData.otrosGastos) {
-                    otrosGastosRecreado = new OtrosCostos(
-                        tareaData.otrosGastos.nombre,
-                        tareaData.otrosGastos.costoPorUnidad
-                    );
-                    otrosGastosRecreado.inventario = tareaData.otrosGastos.inventario;
+                    // Manejar tanto el formato anterior (objeto único) como el nuevo (array)
+                    const otrosGastosData = Array.isArray(tareaData.otrosGastos) ? tareaData.otrosGastos : [tareaData.otrosGastos];
+                    
+                    otrosGastosData.forEach(gastoData => {
+                        const gasto = new OtrosCostos(
+                            gastoData.nombre,
+                            gastoData.costoPorUnidad
+                        );
+                        gasto.inventario = gastoData.inventario;
+                        otrosGastosRecreados.push(gasto);
+                    });
                 }
                 
                 // Recrear la instancia de Tarea
                 const tareaRecreada = new Tarea(
                     tareaData.nombre,
                     personalRecreado,
-                    materialRecreado,
-                    otrosGastosRecreado,
+                    materialesRecreados,
+                    otrosGastosRecreados,
                     tareaData.duracion
                 );
                 tareaRecreada.estado = tareaData.estado;
@@ -106,7 +135,7 @@ function actualizarListaTareas() {
     const listaDiv = document.getElementById('listaTareas');
     
     if (tareasCreadas.length === 0) {
-        estadisticasDiv.innerHTML = '<p class="empty-stats">📭 No hay tareas creadas aún</p>';
+        estadisticasDiv.innerHTML = '<p class="empty-stats"> No hay tareas creadas aún</p>';
         listaDiv.innerHTML = '<p class="empty-state">Crea tu primera tarea usando el botón de arriba</p>';
         return;
     }
@@ -118,10 +147,13 @@ function actualizarListaTareas() {
     const tareasCompletadas = tareasCreadas.filter(item => item.tarea.getEstado() === 'completada').length;
     const duracionPromedio = tareasCreadas.reduce((sum, item) => sum + item.tarea.getDuracion(), 0) / totalTareas;
     const costoTotal = tareasCreadas.reduce((sum, item) => sum + item.tarea.calcularCostoTotal(), 0);
+    const costoReal = tareasCreadas
+        .filter(item => item.tarea.getEstado() === 'completada')
+        .reduce((sum, item) => sum + item.tarea.calcularCostoTotal(), 0);
     
-    // Mostrar estadísticas
+    // Mostrar estadísticas con el formato correcto
     estadisticasDiv.innerHTML = `
-        <h3 class="stats-title"><img src="../storage/vectors/stats-svgrepo-com.svg" alt="" class="stats-icon-large">Estadísticas de Tareas</h3>
+        <h3 class="stats-title"><img src="../storage/vectors/stats-svgrepo-com.svg" alt="" class="stats-icon-large">Estadísticas Generales</h3>
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-value success">${totalTareas}</div>
@@ -147,75 +179,55 @@ function actualizarListaTareas() {
                 <div class="stat-value success">$${costoTotal.toFixed(2)}</div>
                 <div class="stat-label">Costo Total</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-value danger">$${costoReal.toFixed(2)}</div>
+                <div class="stat-label">Costo Real</div>
+            </div>
         </div>
     `;
     
-    // Crear lista de tareas
-    let listaHTML = '<div class="employees-grid">';
+    // Mostrar lista de tareas con formato vertical como empleados
+    let listaHTML = '<h3 class="employees-title"><img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon-large">Lista Detallada</h3>';
+    
     tareasCreadas.forEach((item, index) => {
         const tarea = item.tarea;
         const estadoClass = tarea.getEstado() === 'completada' ? 'success' : 
                            tarea.getEstado() === 'en_progreso' ? 'primary' : 'warning';
         const estadoText = tarea.getEstado() === 'completada' ? 'Completada' :
                           tarea.getEstado() === 'en_progreso' ? 'En Progreso' : 'Pendiente';
+        const fechaFormateada = item.fechaCreacion.toLocaleString('es-ES');
         
         listaHTML += `
             <div class="employee-card">
                 <div class="employee-header">
-                    <div class="employee-title-section">
-                        <h4 class="employee-name">${tarea.getNombre()}</h4>
-                        <span class="employee-id">#${item.id}</span>
-                    </div>
-                    <div class="dropdown-actions">
-                        <button onclick="toggleDropdown(${index}, event)" class="dropdown-btn" title="Opciones">
-                            <img src="../storage/vectors/equalizer-svgrepo-com.svg" alt="Opciones" class="dropdown-icon">
-                        </button>
-                        <div id="dropdown-${index}" class="dropdown-menu">
-                            <button onclick="cambiarEstadoTarea(${index}); closeAllDropdowns()" class="dropdown-item">
-                                Cambiar Estado
-                            </button>
-                            <button onclick="verDetallesTarea(${index}); closeAllDropdowns()" class="dropdown-item">
-                                Ver Detalles
-                            </button>
-                            <button onclick="eliminarTarea(${index}); closeAllDropdowns()" class="dropdown-item danger">
-                                Eliminar
-                            </button>
-                        </div>
-                    </div>
+                    <h4 class="employee-name"><img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon-large"> ${tarea.getNombre()}</h4>
+                    <span class="employee-id">ID: ${item.id}</span>
                 </div>
-                <div class="employee-details-horizontal">
-                    <span class="detail-item">
-                        <strong>Duración:</strong> ${tarea.getDuracion()}h
-                    </span>
-                    <span class="detail-separator">•</span>
-                    <span class="detail-item">
-                        <strong>Estado:</strong> <span class="${estadoClass}">${estadoText}</span>
-                    </span>
-                    <span class="detail-separator">•</span>
-                    <span class="detail-item">
-                        <strong>Personal:</strong> ${tarea.getPersonal() ? tarea.getPersonal().getNombre() : 'No asignado'}
-                    </span>
-                    <span class="detail-separator">•</span>
-                    <span class="detail-item">
-                        <strong>Material:</strong> ${tarea.getMaterial() ? tarea.getMaterial().getNombreMaterial() : 'No asignado'}
-                    </span>
-                    <span class="detail-separator">•</span>
-                    <span class="detail-item">
-                        <strong>Otros Gastos:</strong> ${tarea.getOtrosGastos() ? tarea.getOtrosGastos().getNombre() : 'No asignados'}
-                    </span>
-                    <span class="detail-separator">•</span>
-                    <span class="detail-item">
-                        <strong>Costo:</strong> <span class="success">$${tarea.calcularCostoTotal().toFixed(2)}</span>
-                    </span>
-                    <span class="detail-separator">•</span>
-                    <span class="detail-item">
-                        <strong>Creada:</strong> ${item.fechaCreacion.toLocaleDateString()}
-                    </span>
+                
+                <div class="employee-details">
+                    <div class="employee-detail"><strong><img src="../storage/vectors/clock-svgrepo-com.svg" alt="" class="clock-icon"> Duración:</strong> ${tarea.getDuracion()}h</div>
+                    <div class="employee-detail"><strong><img src="../storage/vectors/traffic-light-svgrepo-com.svg" alt="" class="traffic-light-icon"> Estado:</strong> <span class="${estadoClass}">${estadoText}</span></div>
+                                         <div class="employee-detail"><strong><img src="../storage/vectors/user-svgrepo-com.svg" alt="" class="user-icon"> Personal:</strong> ${tarea.getPersonalArray().length > 0 ? tarea.getPersonalArray().map(emp => emp.getNombre()).join(', ') : 'No asignado'}</div>
+                                         <div class="employee-detail"><strong><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon"> Materiales:</strong> ${tarea.getMateriales().length > 0 ? tarea.getMateriales().map(mat => mat.getNombreMaterial()).join(', ') : 'No asignados'}</div>
+                     <div class="employee-detail"><strong><img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="" class="briefcase-icon"> Otros Gastos:</strong> ${tarea.getOtrosGastosArray().length > 0 ? tarea.getOtrosGastosArray().map(gasto => gasto.getNombre()).join(', ') : 'No asignados'}</div>
+                    <div class="employee-detail"><strong><img src="../storage/vectors/circle-dollar-svgrepo-com.svg" alt="" class="circle-dollar-icon"> Costo Total:</strong> $${tarea.calcularCostoTotal().toFixed(2)}</div>
                 </div>
+                
+                <div class="employee-date">
+                    <img src="../storage/vectors/coins-svgrepo-com.svg" alt="" class="coins-icon"> Creado: ${fechaFormateada}
+                </div>
+                
+                                 <div class="employee-actions">
+                     <button onclick="cambiarEstadoTarea(${index})" class="button button-primary">
+                         <img src="../storage/vectors/traffic-light-svgrepo-com.svg" alt="" class="button-icon">Cambiar Estado
+                     </button>
+                     <button onclick="eliminarTarea(${index})" class="button button-danger">
+                         <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="button-icon">Eliminar
+                     </button>
+                 </div>
             </div>
         `;
     });
-    listaHTML += '</div>';
     
     listaDiv.innerHTML = listaHTML;
 }
@@ -260,49 +272,33 @@ function cambiarEstadoTarea(index) {
 // Función para ver detalles de una tarea
 function verDetallesTarea(index) {
     const tarea = tareasCreadas[index].tarea;
-    alert(tarea.mostrarDetalles());
+    console.log(tarea.mostrarDetalles());
 }
 
 // Función para eliminar una tarea específica
 function eliminarTarea(index) {
-    if (confirm(`¿Está seguro de que desea eliminar la tarea "${tareasCreadas[index].tarea.getNombre()}"?`)) {
-        const tareaAEliminar = tareasCreadas[index].tarea;
-        const nombreEliminado = tareaAEliminar.getNombre();
-        
-        // Si la tarea estaba completada, quitar las horas del empleado
-        if (tareaAEliminar.getEstado() === 'completada') {
-            quitarHorasAlEmpleado(tareaAEliminar);
-        }
-        
-        tareasCreadas.splice(index, 1);
-        guardarTareasEnStorage(); // Guardar cambios en localStorage
-        console.log(`❌ Tarea eliminada: ${nombreEliminado}`);
-        actualizarListaTareas();
-        actualizarContadorTareas();
-    }
+    // Guardar el índice de la tarea a eliminar
+    tareaAEliminarIndex = index;
+    
+    // Abrir el modal de confirmación
+    const modal = document.getElementById('modalConfirmacionEliminarTarea');
+    modal.style.display = 'block';
 }
 
 // Función para limpiar toda la lista
 function limpiarListaTareas() {
-    if (tareasCreadas.length === 0) {
-        alert('📭 La lista ya está vacía');
-        return;
-    }
+    // Quitar horas de todas las tareas completadas antes de limpiar
+    tareasCreadas.forEach(item => {
+        if (item.tarea.getEstado() === 'completada') {
+            quitarHorasAlEmpleado(item.tarea);
+        }
+    });
     
-    if (confirm(`¿Está seguro de que desea eliminar todas las ${tareasCreadas.length} tareas?`)) {
-        // Quitar horas de todas las tareas completadas antes de limpiar
-        tareasCreadas.forEach(item => {
-            if (item.tarea.getEstado() === 'completada') {
-                quitarHorasAlEmpleado(item.tarea);
-            }
-        });
-        
-        tareasCreadas = [];
-        guardarTareasEnStorage(); // Guardar cambios en localStorage
-        actualizarListaTareas();
-        actualizarContadorTareas();
-        console.log('Lista de tareas limpiada');
-    }
+    tareasCreadas = [];
+    guardarTareasEnStorage(); // Guardar cambios en localStorage
+    actualizarListaTareas();
+    actualizarContadorTareas();
+    console.log('Lista de tareas limpiada');
 }
 
 // ===== FUNCIONES PARA GESTIÓN DE HORAS DE EMPLEADOS =====
@@ -355,72 +351,82 @@ function guardarEmpleadosParaTareas(empleadosCreados) {
 
 // Función para asignar horas al empleado cuando se completa una tarea
 function asignarHorasAlEmpleado(tarea) {
-    const empleadoAsignado = tarea.getPersonal();
+    const empleadosAsignados = tarea.getPersonalArray();
     const duracionTarea = tarea.getDuracion();
     
-    // Solo proceder si hay un empleado asignado y duración válida
-    if (!empleadoAsignado || duracionTarea <= 0) {
+    // Solo proceder si hay empleados asignados y duración válida
+    if (empleadosAsignados.length === 0 || duracionTarea <= 0) {
         return;
     }
     
     // Cargar empleados actuales
     const empleadosCreados = cargarEmpleadosParaTareas();
     
-    // Buscar el empleado específico por nombre (asumiendo que los nombres son únicos)
-    const empleadoEncontrado = empleadosCreados.find(item => 
-        item.empleado.getNombre() === empleadoAsignado.getNombre()
-    );
+    // Dividir la duración entre todos los empleados
+    const duracionPorEmpleado = duracionTarea / empleadosAsignados.length;
     
-    if (empleadoEncontrado) {
-        // Obtener horas actuales y sumar las nuevas
-        const horasActuales = empleadoEncontrado.empleado.getHorasTrabajadas();
-        const nuevasHoras = horasActuales + duracionTarea;
+    empleadosAsignados.forEach(empleadoAsignado => {
+        // Buscar el empleado específico por nombre (asumiendo que los nombres son únicos)
+        const empleadoEncontrado = empleadosCreados.find(item => 
+            item.empleado.getNombre() === empleadoAsignado.getNombre()
+        );
         
-        // Asignar nuevas horas
-        empleadoEncontrado.empleado.setHorasTrabajadas(nuevasHoras);
-        
-        // Guardar cambios
-        guardarEmpleadosParaTareas(empleadosCreados);
-        
-        console.log(`✅ Asignadas ${duracionTarea}h al empleado "${empleadoAsignado.getNombre()}" (Total: ${nuevasHoras}h)`);
-    } else {
-        console.warn(`⚠️ No se encontró el empleado "${empleadoAsignado.getNombre()}" en el sistema`);
-    }
+        if (empleadoEncontrado) {
+            // Obtener horas actuales y sumar las nuevas
+            const horasActuales = empleadoEncontrado.empleado.getHorasTrabajadas();
+            const nuevasHoras = horasActuales + duracionPorEmpleado;
+            
+            // Asignar nuevas horas
+            empleadoEncontrado.empleado.setHorasTrabajadas(nuevasHoras);
+            
+            console.log(`✅ Asignadas ${duracionPorEmpleado.toFixed(1)}h al empleado "${empleadoAsignado.getNombre()}" (Total: ${nuevasHoras.toFixed(1)}h)`);
+        } else {
+            console.warn(`⚠️ No se encontró el empleado "${empleadoAsignado.getNombre()}" en el sistema`);
+        }
+    });
+    
+    // Guardar cambios
+    guardarEmpleadosParaTareas(empleadosCreados);
 }
 
 // Función para quitar horas al empleado cuando se desmarca una tarea como completada
 function quitarHorasAlEmpleado(tarea) {
-    const empleadoAsignado = tarea.getPersonal();
+    const empleadosAsignados = tarea.getPersonalArray();
     const duracionTarea = tarea.getDuracion();
     
-    // Solo proceder si hay un empleado asignado y duración válida
-    if (!empleadoAsignado || duracionTarea <= 0) {
+    // Solo proceder si hay empleados asignados y duración válida
+    if (empleadosAsignados.length === 0 || duracionTarea <= 0) {
         return;
     }
     
     // Cargar empleados actuales
     const empleadosCreados = cargarEmpleadosParaTareas();
     
-    // Buscar el empleado específico por nombre
-    const empleadoEncontrado = empleadosCreados.find(item => 
-        item.empleado.getNombre() === empleadoAsignado.getNombre()
-    );
+    // Dividir la duración entre todos los empleados
+    const duracionPorEmpleado = duracionTarea / empleadosAsignados.length;
     
-    if (empleadoEncontrado) {
-        // Obtener horas actuales y restar las horas de la tarea
-        const horasActuales = empleadoEncontrado.empleado.getHorasTrabajadas();
-        const nuevasHoras = Math.max(0, horasActuales - duracionTarea); // No permitir valores negativos
+    empleadosAsignados.forEach(empleadoAsignado => {
+        // Buscar el empleado específico por nombre
+        const empleadoEncontrado = empleadosCreados.find(item => 
+            item.empleado.getNombre() === empleadoAsignado.getNombre()
+        );
         
-        // Asignar nuevas horas
-        empleadoEncontrado.empleado.setHorasTrabajadas(nuevasHoras);
-        
-        // Guardar cambios
-        guardarEmpleadosParaTareas(empleadosCreados);
-        
-        console.log(`➖ Quitadas ${duracionTarea}h al empleado "${empleadoAsignado.getNombre()}" (Total: ${nuevasHoras}h)`);
-    } else {
-        console.warn(`⚠️ No se encontró el empleado "${empleadoAsignado.getNombre()}" en el sistema`);
-    }
+        if (empleadoEncontrado) {
+            // Obtener horas actuales y restar las horas de la tarea
+            const horasActuales = empleadoEncontrado.empleado.getHorasTrabajadas();
+            const nuevasHoras = Math.max(0, horasActuales - duracionPorEmpleado); // No permitir valores negativos
+            
+            // Asignar nuevas horas
+            empleadoEncontrado.empleado.setHorasTrabajadas(nuevasHoras);
+            
+            console.log(`➖ Quitadas ${duracionPorEmpleado.toFixed(1)}h al empleado "${empleadoAsignado.getNombre()}" (Total: ${nuevasHoras.toFixed(1)}h)`);
+        } else {
+            console.warn(`⚠️ No se encontró el empleado "${empleadoAsignado.getNombre()}" en el sistema`);
+        }
+    });
+    
+    // Guardar cambios
+    guardarEmpleadosParaTareas(empleadosCreados);
 }
 
 // ===== FUNCIONES PARA DROPDOWN =====
@@ -455,35 +461,21 @@ document.addEventListener('click', function(event) {
     }
 });
 
-// Función para exportar tareas a la consola
-function exportarTareas() {
-    if (tareasCreadas.length === 0) {
-        alert('📭 No hay tareas para exportar');
-        return;
+// Cerrar modales al hacer clic fuera
+window.onclick = function(event) {
+    const modalCrearTarea = document.getElementById('modalCrearTarea');
+    const modalConfiguracion = document.getElementById('modalConfiguracion');
+    
+    if (event.target === modalCrearTarea) {
+        cerrarModalCrearTarea();
     }
     
-    console.log('📄 ===== EXPORTACIÓN DE TAREAS =====');
-    console.log(`Total de tareas: ${tareasCreadas.length}`);
-    console.log('');
-    
-    tareasCreadas.forEach((item, index) => {
-        const tarea = item.tarea;
-        console.log(`--- Tarea ${index + 1} ---`);
-        console.log(tarea.mostrarDetalles());
-        console.log('');
-    });
-    
-    console.log('📄 ===== FIN DE EXPORTACIÓN =====');
-    alert('📄 Tareas exportadas a la consola. Abre las herramientas de desarrollador (F12) para verlas.');
-}
+    if (event.target === modalConfiguracion) {
+        cerrarModalConfiguracion();
+    }
+};
 
-// Función para mostrar rangos detallados
-function mostrarRangosDetallados() {
-    const rangos = obtenerRangosTareas();
-    alert(`Rangos configurados para tareas:\n\n` +
-          `⏱️ Duración: ${rangos.duracionMin} - ${rangos.duracionMax} horas\n\n` +
-          `Estos rangos se validan al crear nuevas tareas.`);
-}
+
 
 // ===== FUNCIONES DEL MODAL DE CREAR TAREA =====
 
@@ -505,12 +497,58 @@ function cerrarModalCrearTarea() {
     document.getElementById('modalCrearTarea').style.display = 'none';
 }
 
+// ===== FUNCIONES PARA MODAL DE CONFIRMACIÓN DE ELIMINACIÓN =====
+
+function confirmarEliminarTarea() {
+    if (tareaAEliminarIndex >= 0 && tareaAEliminarIndex < tareasCreadas.length) {
+        const tareaAEliminar = tareasCreadas[tareaAEliminarIndex].tarea;
+        const nombreEliminado = tareaAEliminar.getNombre();
+        
+        // Si la tarea estaba completada, quitar las horas del empleado
+        if (tareaAEliminar.getEstado() === 'completada') {
+            quitarHorasAlEmpleado(tareaAEliminar);
+        }
+        
+        tareasCreadas.splice(tareaAEliminarIndex, 1);
+        guardarTareasEnStorage(); // Guardar cambios en localStorage
+        console.log(`❌ Tarea eliminada: ${nombreEliminado}`);
+        actualizarListaTareas();
+        actualizarContadorTareas();
+    }
+    
+    // Cerrar el modal y resetear el índice
+    cerrarModalConfirmacionEliminarTarea();
+}
+
+function cerrarModalConfirmacionEliminarTarea() {
+    document.getElementById('modalConfirmacionEliminarTarea').style.display = 'none';
+    tareaAEliminarIndex = -1; // Resetear el índice
+}
+
 function limpiarFormularioTarea() {
     document.getElementById('nombreTarea').value = '';
     document.getElementById('duracionTarea').value = '';
-    document.getElementById('personalAsignado').selectedIndex = 0;
-    document.getElementById('materialAsignado').selectedIndex = 0;
-    document.getElementById('otrosGastosAsignado').selectedIndex = 0;
+    
+    // Limpiar selección de empleados
+    document.getElementById('empleadosSeleccionados').innerHTML = '';
+    const empleadosOptions = document.querySelectorAll('#listaEmpleados .empleado-option');
+    empleadosOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    // Limpiar selección de materiales
+    document.getElementById('materialesSeleccionados').innerHTML = '';
+    const materialesOptions = document.querySelectorAll('#listaMateriales .empleado-option');
+    materialesOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    // Limpiar selección de otros gastos
+    document.getElementById('otrosGastosSeleccionados').innerHTML = '';
+    const otrosGastosOptions = document.querySelectorAll('#listaOtrosGastos .empleado-option');
+    otrosGastosOptions.forEach(option => {
+        option.classList.remove('selected');
+    });
     
     // Limpiar mensajes de error
     document.getElementById('errorNombreTarea').textContent = '';
@@ -523,8 +561,8 @@ function limpiarFormularioTarea() {
 
 function cargarOpcionesFormulario() {
     // Cargar empleados
-    const selectPersonal = document.getElementById('personalAsignado');
-    selectPersonal.innerHTML = '<option value="">-- Sin personal asignado --</option>';
+    const listaEmpleados = document.getElementById('listaEmpleados');
+    listaEmpleados.innerHTML = '';
     
     // Obtener empleados del localStorage
     try {
@@ -533,7 +571,23 @@ function cargarOpcionesFormulario() {
             const empleados = JSON.parse(empleadosGuardados);
             empleados.forEach((item, index) => {
                 const empleado = item.empleado;
-                selectPersonal.innerHTML += `<option value="${index}">${empleado.nombre} ($${empleado.costoPorHora}/h)</option>`;
+                const empleadoOption = document.createElement('div');
+                empleadoOption.className = 'empleado-option';
+                empleadoOption.dataset.index = index;
+                empleadoOption.innerHTML = `
+                    <div class="empleado-info">
+                        <div class="empleado-nombre">${empleado.nombre}</div>
+                        <div class="empleado-costo">$${empleado.costoPorHora}/h</div>
+                    </div>
+                    <img src="../storage/vectors/circle-check-svgrepo-com.svg" alt="" class="check-icon">
+                `;
+                
+                // Agregar evento de clic
+                empleadoOption.addEventListener('click', function() {
+                    toggleEmpleadoSeleccionado(index, empleadoOption);
+                });
+                
+                listaEmpleados.appendChild(empleadoOption);
             });
         }
     } catch (error) {
@@ -541,8 +595,8 @@ function cargarOpcionesFormulario() {
     }
     
     // Cargar materiales
-    const selectMaterial = document.getElementById('materialAsignado');
-    selectMaterial.innerHTML = '<option value="">-- Sin material asignado --</option>';
+    const listaMateriales = document.getElementById('listaMateriales');
+    listaMateriales.innerHTML = '';
     
     try {
         const materialesGuardados = localStorage.getItem('materialesCreados');
@@ -550,7 +604,23 @@ function cargarOpcionesFormulario() {
             const materiales = JSON.parse(materialesGuardados);
             materiales.forEach((item, index) => {
                 const material = item.material;
-                selectMaterial.innerHTML += `<option value="${index}">${material.nombreMaterial} ($${material.costoPorUnidad}/u)</option>`;
+                const materialOption = document.createElement('div');
+                materialOption.className = 'empleado-option';
+                materialOption.dataset.index = index;
+                materialOption.innerHTML = `
+                    <div class="empleado-info">
+                        <div class="empleado-nombre">${material.nombreMaterial}</div>
+                        <div class="empleado-costo">$${material.costoPorUnidad}/u</div>
+                    </div>
+                    <img src="../storage/vectors/circle-check-svgrepo-com.svg" alt="" class="check-icon">
+                `;
+                
+                // Agregar evento de clic
+                materialOption.addEventListener('click', function() {
+                    toggleMaterialSeleccionado(index, materialOption);
+                });
+                
+                listaMateriales.appendChild(materialOption);
             });
         }
     } catch (error) {
@@ -558,8 +628,8 @@ function cargarOpcionesFormulario() {
     }
     
     // Cargar otros gastos
-    const selectOtrosGastos = document.getElementById('otrosGastosAsignado');
-    selectOtrosGastos.innerHTML = '<option value="">-- Sin otros gastos asignados --</option>';
+    const listaOtrosGastos = document.getElementById('listaOtrosGastos');
+    listaOtrosGastos.innerHTML = '';
     
     try {
         const otrosGastosGuardados = localStorage.getItem('otrosGastosCreados');
@@ -567,7 +637,23 @@ function cargarOpcionesFormulario() {
             const otrosGastos = JSON.parse(otrosGastosGuardados);
             otrosGastos.forEach((item, index) => {
                 const gasto = item.otroGasto;
-                selectOtrosGastos.innerHTML += `<option value="${index}">${gasto.nombre} ($${gasto.costoPorUnidad}/u)</option>`;
+                const gastoOption = document.createElement('div');
+                gastoOption.className = 'empleado-option';
+                gastoOption.dataset.index = index;
+                gastoOption.innerHTML = `
+                    <div class="empleado-info">
+                        <div class="empleado-nombre">${gasto.nombre}</div>
+                        <div class="empleado-costo">$${gasto.costoPorUnidad}/u</div>
+                    </div>
+                    <img src="../storage/vectors/circle-check-svgrepo-com.svg" alt="" class="check-icon">
+                `;
+                
+                // Agregar evento de clic
+                gastoOption.addEventListener('click', function() {
+                    toggleOtroGastoSeleccionado(index, gastoOption);
+                });
+                
+                listaOtrosGastos.appendChild(gastoOption);
             });
         }
     } catch (error) {
@@ -608,16 +694,22 @@ function validarDuracionTarea(duracion) {
 function validarYCrearTarea() {
     const nombre = document.getElementById('nombreTarea').value.trim();
     const duracion = document.getElementById('duracionTarea').value;
-    const personalIndex = document.getElementById('personalAsignado').value;
-    const materialIndex = document.getElementById('materialAsignado').value;
-    const otrosGastosIndex = document.getElementById('otrosGastosAsignado').value;
+    const personalIndexes = Array.from(document.querySelectorAll('#listaEmpleados .empleado-option.selected')).map(option => option.dataset.index);
+    const materialesIndexes = Array.from(document.querySelectorAll('#listaMateriales .empleado-option.selected')).map(option => option.dataset.index);
+    const otrosGastosIndexes = Array.from(document.querySelectorAll('#listaOtrosGastos .empleado-option.selected')).map(option => option.dataset.index);
+    
+    let tieneErrores = false;
     
     // Validar nombre
     const errorNombre = validarNombreTarea(nombre);
     if (errorNombre) {
         document.getElementById('errorNombreTarea').textContent = '❌ ' + errorNombre;
         document.getElementById('nombreTarea').classList.add('invalid');
-        return;
+        tieneErrores = true;
+    } else {
+        document.getElementById('errorNombreTarea').textContent = '✅ Nombre válido';
+        document.getElementById('nombreTarea').classList.remove('invalid');
+        document.getElementById('nombreTarea').classList.add('valid');
     }
     
     // Validar duración
@@ -625,60 +717,97 @@ function validarYCrearTarea() {
     if (errorDuracion) {
         document.getElementById('errorDuracionTarea').textContent = '❌ ' + errorDuracion;
         document.getElementById('duracionTarea').classList.add('invalid');
+        tieneErrores = true;
+    } else {
+        document.getElementById('errorDuracionTarea').textContent = '✅ Duración válida';
+        document.getElementById('duracionTarea').classList.remove('invalid');
+        document.getElementById('duracionTarea').classList.add('valid');
+    }
+    
+    // Si hay errores, mostrar indicador visual en lugar de alerta
+    if (tieneErrores) {
+        // Agregar clase de error al modal
+        const modalContent = document.querySelector('#modalCrearTarea .modal-content');
+        
+        if (modalContent) {
+            // Remover la clase si ya existe para forzar la animación
+            modalContent.classList.remove('modal-error');
+            
+            // Forzar un reflow para asegurar que la animación se ejecute
+            modalContent.offsetHeight;
+            
+            // Agregar la clase de error
+            modalContent.classList.add('modal-error');
+            
+            // Remover la clase después de 3 segundos
+            setTimeout(() => {
+                modalContent.classList.remove('modal-error');
+            }, 3000);
+        }
+        
         return;
     }
     
     try {
         // Obtener instancias de los recursos asignados
-        let personal = null;
-        let material = null;
-        let otrosGastos = null;
+        let personal = [];
+        let materiales = [];
+        let otrosGastos = [];
         
-        // Personal
-        if (personalIndex !== '') {
+        // Personal (múltiple)
+        if (personalIndexes.length > 0) {
             const empleadosGuardados = localStorage.getItem('empleadosCreados');
             if (empleadosGuardados) {
                 const empleados = JSON.parse(empleadosGuardados);
-                const empleadoData = empleados[parseInt(personalIndex)].empleado;
-                personal = new Personal(
-                    empleadoData.nombre,
-                    empleadoData.costoPorHora,
-                    empleadoData.costoPorHoraExtra
-                );
-                personal.horasTrabajadas = empleadoData.horasTrabajadas;
+                personalIndexes.forEach(index => {
+                    const empleadoData = empleados[parseInt(index)].empleado;
+                    const empleado = new Personal(
+                        empleadoData.nombre,
+                        empleadoData.costoPorHora,
+                        empleadoData.costoPorHoraExtra
+                    );
+                    empleado.horasTrabajadas = empleadoData.horasTrabajadas;
+                    personal.push(empleado);
+                });
             }
         }
         
-        // Material
-        if (materialIndex !== '') {
+        // Materiales (múltiples)
+        if (materialesIndexes.length > 0) {
             const materialesGuardados = localStorage.getItem('materialesCreados');
             if (materialesGuardados) {
-                const materiales = JSON.parse(materialesGuardados);
-                const materialData = materiales[parseInt(materialIndex)].material;
-                material = new Material(
-                    materialData.nombreMaterial,
-                    materialData.costoPorUnidad
-                );
-                material.inventario = materialData.inventario;
+                const materialesData = JSON.parse(materialesGuardados);
+                materialesIndexes.forEach(index => {
+                    const materialData = materialesData[parseInt(index)].material;
+                    const material = new Material(
+                        materialData.nombreMaterial,
+                        materialData.costoPorUnidad
+                    );
+                    material.inventario = materialData.inventario;
+                    materiales.push(material);
+                });
             }
         }
         
-        // Otros gastos
-        if (otrosGastosIndex !== '') {
+        // Otros gastos (múltiples)
+        if (otrosGastosIndexes.length > 0) {
             const otrosGastosGuardados = localStorage.getItem('otrosGastosCreados');
             if (otrosGastosGuardados) {
                 const otrosGastos_array = JSON.parse(otrosGastosGuardados);
-                const otroGastoData = otrosGastos_array[parseInt(otrosGastosIndex)].otroGasto;
-                otrosGastos = new OtrosCostos(
-                    otroGastoData.nombre,
-                    otroGastoData.costoPorUnidad
-                );
-                otrosGastos.inventario = otroGastoData.inventario;
+                otrosGastosIndexes.forEach(index => {
+                    const otroGastoData = otrosGastos_array[parseInt(index)].otroGasto;
+                    const otroGasto = new OtrosCostos(
+                        otroGastoData.nombre,
+                        otroGastoData.costoPorUnidad
+                    );
+                    otroGasto.inventario = otroGastoData.inventario;
+                    otrosGastos.push(otroGasto);
+                });
             }
         }
         
-        // Crear la tarea
-        const nuevaTarea = new Tarea(nombre, personal, material, otrosGastos, parseFloat(duracion));
+        // Crear la tarea con arrays de materiales y otros gastos
+        const nuevaTarea = new Tarea(nombre, personal.length > 0 ? personal : null, materiales, otrosGastos, parseFloat(duracion));
         
         // Agregar a la lista
         agregarTareaALista(nuevaTarea);
@@ -690,8 +819,19 @@ function validarYCrearTarea() {
         console.log(`Costo estimado: $${nuevaTarea.calcularCostoTotal().toFixed(2)}`);
         
     } catch (error) {
-        alert(`❌ Error al crear la tarea: ${error.message}`);
         console.error('Error al crear tarea:', error);
+        
+        // Mostrar error visual en el modal
+        const modalContent = document.querySelector('#modalCrearTarea .modal-content');
+        if (modalContent) {
+            modalContent.classList.remove('modal-error');
+            modalContent.offsetHeight;
+            modalContent.classList.add('modal-error');
+            
+            setTimeout(() => {
+                modalContent.classList.remove('modal-error');
+            }, 3000);
+        }
     }
 }
 
@@ -718,6 +858,7 @@ function abrirModalConfiguracion() {
     cargarConfiguracionGlobal();
     document.getElementById('modalConfiguracion').style.display = 'block';
     actualizarInterfazConfiguracion();
+    actualizarEstadisticasSistemaConfig();
 }
 
 function cerrarModalConfiguracion() {
@@ -763,7 +904,7 @@ function aplicarConfiguracionTareas() {
     
     // Validar rangos de tareas únicamente
     if (duracionMin >= duracionMax) {
-        alert("⚠️ Error: La duración mínima debe ser menor que la máxima");
+        console.warn("⚠️ Error: La duración mínima debe ser menor que la máxima");
         return;
     }
     
@@ -779,33 +920,230 @@ function aplicarConfiguracionTareas() {
     
     actualizarRangosActualesMostrados();
     
-    alert(`✅ Configuración de rangos para tareas aplicada exitosamente:\n\n` +
-          `Duración: ${duracionMin} - ${duracionMax} horas\n\n` +
+    console.log(`✅ Configuración de rangos para tareas aplicada exitosamente:\n` +
+          `Duración: ${duracionMin} - ${duracionMax} horas\n` +
           `Los cambios se aplicarán inmediatamente en la sección de tareas.`);
 }
 
 function aplicarConfiguracionValidacion() {
-    alert('✅ Configuración de validación aplicada');
+    console.log('✅ Configuración de validación aplicada');
 }
 
 function aplicarConfiguracionInterfaz() {
-    alert('✅ Configuración de interfaz aplicada');
+    console.log('✅ Configuración de interfaz aplicada');
 }
 
 function exportarConfiguracion() {
-    alert('📤 Configuración exportada');
+    console.log('📤 Configuración exportada');
 }
 
 function resetearConfiguracion() {
-    alert('🔄 Configuración restaurada');
+    console.log('🔄 Configuración restaurada');
 }
 
 function limpiarDatosSistema() {
-    alert('Datos del sistema eliminados');
+    console.log('Datos del sistema eliminados');
+}
+
+// ===== FUNCIONES PARA SELECCIÓN DE EMPLEADOS =====
+
+function toggleEmpleadoSeleccionado(index, empleadoOption) {
+    const isSelected = empleadoOption.classList.contains('selected');
+    
+    if (isSelected) {
+        // Deseleccionar
+        empleadoOption.classList.remove('selected');
+        removerEmpleadoTag(index);
+    } else {
+        // Seleccionar
+        empleadoOption.classList.add('selected');
+        agregarEmpleadoTag(index, empleadoOption);
+    }
+}
+
+function agregarEmpleadoTag(index, empleadoOption) {
+    const empleadosSeleccionadosDiv = document.getElementById('empleadosSeleccionados');
+    const empleadoNombre = empleadoOption.querySelector('.empleado-nombre').textContent;
+    
+    const empleadoTag = document.createElement('div');
+    empleadoTag.className = 'empleado-tag';
+    empleadoTag.dataset.index = index;
+    empleadoTag.innerHTML = `
+        <span>${empleadoNombre}</span>
+        <button class="remove-btn" onclick="removerEmpleadoSeleccionado('${index}')">×</button>
+    `;
+    empleadosSeleccionadosDiv.appendChild(empleadoTag);
+}
+
+function removerEmpleadoSeleccionado(index) {
+    // Remover tag
+    const empleadoTag = document.querySelector(`.empleado-tag[data-index="${index}"]`);
+    if (empleadoTag) {
+        empleadoTag.remove();
+    }
+    
+    // Deseleccionar en la lista
+    const empleadoOption = document.querySelector(`.empleado-option[data-index="${index}"]`);
+    if (empleadoOption) {
+        empleadoOption.classList.remove('selected');
+    }
+}
+
+function removerEmpleadoTag(index) {
+    const empleadoTag = document.querySelector(`.empleado-tag[data-index="${index}"]`);
+    if (empleadoTag) {
+        empleadoTag.remove();
+    }
+}
+
+// ===== FUNCIONES PARA SELECCIÓN DE MATERIALES =====
+
+function toggleMaterialSeleccionado(index, materialOption) {
+    const isSelected = materialOption.classList.contains('selected');
+    
+    if (isSelected) {
+        // Deseleccionar
+        materialOption.classList.remove('selected');
+        removerMaterialTag(index);
+    } else {
+        // Seleccionar
+        materialOption.classList.add('selected');
+        agregarMaterialTag(index, materialOption);
+    }
+}
+
+function agregarMaterialTag(index, materialOption) {
+    const materialesSeleccionadosDiv = document.getElementById('materialesSeleccionados');
+    const materialNombre = materialOption.querySelector('.empleado-nombre').textContent;
+    
+    const materialTag = document.createElement('div');
+    materialTag.className = 'empleado-tag';
+    materialTag.dataset.index = index;
+    materialTag.innerHTML = `
+        <span>${materialNombre}</span>
+        <button class="remove-btn" onclick="removerMaterialSeleccionado('${index}')">×</button>
+    `;
+    materialesSeleccionadosDiv.appendChild(materialTag);
+}
+
+function removerMaterialSeleccionado(index) {
+    // Remover tag
+    const materialTag = document.querySelector(`#materialesSeleccionados .empleado-tag[data-index="${index}"]`);
+    if (materialTag) {
+        materialTag.remove();
+    }
+    
+    // Deseleccionar en la lista
+    const materialOption = document.querySelector(`#listaMateriales .empleado-option[data-index="${index}"]`);
+    if (materialOption) {
+        materialOption.classList.remove('selected');
+    }
+}
+
+function removerMaterialTag(index) {
+    const materialTag = document.querySelector(`#materialesSeleccionados .empleado-tag[data-index="${index}"]`);
+    if (materialTag) {
+        materialTag.remove();
+    }
+}
+
+// ===== FUNCIONES PARA SELECCIÓN DE OTROS GASTOS =====
+
+function toggleOtroGastoSeleccionado(index, gastoOption) {
+    const isSelected = gastoOption.classList.contains('selected');
+    
+    if (isSelected) {
+        // Deseleccionar
+        gastoOption.classList.remove('selected');
+        removerOtroGastoTag(index);
+    } else {
+        // Seleccionar
+        gastoOption.classList.add('selected');
+        agregarOtroGastoTag(index, gastoOption);
+    }
+}
+
+function agregarOtroGastoTag(index, gastoOption) {
+    const otrosGastosSeleccionadosDiv = document.getElementById('otrosGastosSeleccionados');
+    const gastoNombre = gastoOption.querySelector('.empleado-nombre').textContent;
+    
+    const gastoTag = document.createElement('div');
+    gastoTag.className = 'empleado-tag';
+    gastoTag.dataset.index = index;
+    gastoTag.innerHTML = `
+        <span>${gastoNombre}</span>
+        <button class="remove-btn" onclick="removerOtroGastoSeleccionado('${index}')">×</button>
+    `;
+    otrosGastosSeleccionadosDiv.appendChild(gastoTag);
+}
+
+function removerOtroGastoSeleccionado(index) {
+    // Remover tag
+    const gastoTag = document.querySelector(`#otrosGastosSeleccionados .empleado-tag[data-index="${index}"]`);
+    if (gastoTag) {
+        gastoTag.remove();
+    }
+    
+    // Deseleccionar en la lista
+    const gastoOption = document.querySelector(`#listaOtrosGastos .empleado-option[data-index="${index}"]`);
+    if (gastoOption) {
+        gastoOption.classList.remove('selected');
+    }
+}
+
+function removerOtroGastoTag(index) {
+    const gastoTag = document.querySelector(`#otrosGastosSeleccionados .empleado-tag[data-index="${index}"]`);
+    if (gastoTag) {
+        gastoTag.remove();
+    }
 }
 
 function actualizarEstadisticasSistemaConfig() {
-    document.getElementById('estadisticasSistema').innerHTML = '<p>Estadísticas del sistema</p>';
+    const estadisticasDiv = document.getElementById('estadisticasSistema');
+    
+    // Calcular estadísticas del sistema
+    const totalTareas = tareasCreadas.length;
+    const tareasPendientes = tareasCreadas.filter(item => item.tarea.getEstado() === 'pendiente').length;
+    const tareasEnProgreso = tareasCreadas.filter(item => item.tarea.getEstado() === 'en_progreso').length;
+    const tareasCompletadas = tareasCreadas.filter(item => item.tarea.getEstado() === 'completada').length;
+    const duracionPromedio = totalTareas > 0 ? tareasCreadas.reduce((sum, item) => sum + item.tarea.getDuracion(), 0) / totalTareas : 0;
+    const costoTotal = tareasCreadas.reduce((sum, item) => sum + item.tarea.calcularCostoTotal(), 0);
+    const costoReal = tareasCreadas
+        .filter(item => item.tarea.getEstado() === 'completada')
+        .reduce((sum, item) => sum + item.tarea.calcularCostoTotal(), 0);
+    
+    estadisticasDiv.innerHTML = `
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value success">${totalTareas}</div>
+                <div class="stat-label">Total Tareas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value warning">${tareasPendientes}</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value primary">${tareasEnProgreso}</div>
+                <div class="stat-label">En Progreso</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value purple">${tareasCompletadas}</div>
+                <div class="stat-label">Completadas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value info">${duracionPromedio.toFixed(1)}h</div>
+                <div class="stat-label">Duración Promedio</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value success">$${costoTotal.toFixed(2)}</div>
+                <div class="stat-label">Costo Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value danger">$${costoReal.toFixed(2)}</div>
+                <div class="stat-label">Costo Real</div>
+            </div>
+        </div>
+    `;
 }
 
 // ===== INICIALIZACIÓN DEL SISTEMA =====
@@ -878,4 +1216,45 @@ document.addEventListener('DOMContentLoaded', function() {
     
     document.getElementById('nombreTarea').addEventListener('keypress', handleEnterKey);
     document.getElementById('duracionTarea').addEventListener('keypress', handleEnterKey);
+    
+    // Cerrar modales con tecla Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const modalCrearTarea = document.getElementById('modalCrearTarea');
+            const modalConfiguracion = document.getElementById('modalConfiguracion');
+            const modalConfirmacionEliminarTarea = document.getElementById('modalConfirmacionEliminarTarea');
+            
+            if (modalCrearTarea.style.display === 'block') {
+                cerrarModalCrearTarea();
+            }
+            
+            if (modalConfiguracion.style.display === 'block') {
+                cerrarModalConfiguracion();
+            }
+            
+            if (modalConfirmacionEliminarTarea.style.display === 'block') {
+                cerrarModalConfirmacionEliminarTarea();
+            }
+        }
+    });
+
+    // Cerrar modales al hacer clic fuera de ellos
+    window.onclick = function(event) {
+        const modalCrearTarea = document.getElementById('modalCrearTarea');
+        const modalConfiguracion = document.getElementById('modalConfiguracion');
+        const modalConfirmacionEliminarTarea = document.getElementById('modalConfirmacionEliminarTarea');
+        
+        if (event.target === modalCrearTarea) {
+            cerrarModalCrearTarea();
+        }
+        
+        if (event.target === modalConfiguracion) {
+            cerrarModalConfiguracion();
+        }
+        
+        if (event.target === modalConfirmacionEliminarTarea) {
+            cerrarModalConfirmacionEliminarTarea();
+        }
+    };
+
 });
