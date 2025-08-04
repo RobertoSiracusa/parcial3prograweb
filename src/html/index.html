@@ -6,6 +6,10 @@
     <title>Control de Proyectos - Dashboard</title>
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="../js/Personal.js"></script>
+    <script src="../js/Tarea.js"></script>
+    <script src="../js/Material.js"></script>
+    <script src="../js/OtrosGastos.js"></script>
 </head>
 <body>
     <div class="dashboard-container">
@@ -77,91 +81,162 @@
                 </div>
             </header>
 
-                         <!-- Dashboard Content -->
-             <div class="dashboard-content">
-                 <!-- Stats Cards -->
-                 <div class="stats-section">
-                     <h2 class="section-title">Estadísticas</h2>
-                     <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <img src="../storage/vectors/user-svgrepo-com.svg" alt="Empleados" class="stat-icon-img">
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-number" id="totalEmpleados">0</h3>
-                                <p class="stat-label">Empleados</p>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <img src="../storage/vectors/layers-svgrepo-com.svg" alt="Materiales" class="stat-icon-img">
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-number" id="totalMateriales">0</h3>
-                                <p class="stat-label">Materiales</p>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="Tareas" class="stat-icon-img">
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-number" id="totalTareas">0</h3>
-                                <p class="stat-label">Tareas</p>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <img src="../storage/vectors/coins-svgrepo-com.svg" alt="Gastos" class="stat-icon-img">
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-number" id="totalGastos">$0</h3>
-                                <p class="stat-label">Total Gastos</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                                   <!-- Dashboard Content -->
+              <div class="dashboard-content">
+                  <!-- Estadísticas Básicas -->
+                  <div class="stats-section">
+                      <h2 class="section-title">Estadísticas</h2>
+                      <div class="stats-grid">
+                          <div class="stat-card">
+                              <div class="stat-value primary" id="totalEmpleados">0</div>
+                              <div class="stat-label">Empleados</div>
+                          </div>
+                          <div class="stat-card">
+                              <div class="stat-value purple" id="totalMateriales">0</div>
+                              <div class="stat-label">Materiales</div>
+                          </div>
+                          <div class="stat-card">
+                              <div class="stat-value success" id="totalTareas">0</div>
+                              <div class="stat-label">Tareas</div>
+                          </div>
+                          <div class="stat-card">
+                              <div class="stat-value warning" id="totalGastos">$0</div>
+                              <div class="stat-label">Total Gastos</div>
+                          </div>
+                      </div>
+                  </div>
 
-                <!-- Quick Actions -->
-                <div class="quick-actions-section">
-                    <h2 class="section-title">Acciones Rápidas</h2>
-                    <div class="quick-actions-grid">
-                        <a href="empleados.html" class="quick-action-card">
-                            <div class="action-icon">
-                                <img src="../storage/vectors/user-svgrepo-com.svg" alt="Empleados" class="action-icon-img">
-                            </div>
-                            <h3>Gestionar Empleados</h3>
-                            <p>Crear, editar y administrar empleados del proyecto</p>
-                        </a>
-                        
-                        <a href="materiales.html" class="quick-action-card">
-                            <div class="action-icon">
-                                <img src="../storage/vectors/layers-svgrepo-com.svg" alt="Materiales" class="action-icon-img">
-                            </div>
-                            <h3>Gestionar Materiales</h3>
-                            <p>Administrar inventario y costos de materiales</p>
-                        </a>
-                        
-                        <a href="tareas.html" class="quick-action-card">
-                            <div class="action-icon">
-                                <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="Tareas" class="action-icon-img">
-                            </div>
-                            <h3>Gestionar Tareas</h3>
-                            <p>Organizar y asignar tareas del proyecto</p>
-                        </a>
-                        
-                        <a href="otros-gastos.html" class="quick-action-card">
-                            <div class="action-icon">
-                                <img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="Gastos" class="action-icon-img">
-                            </div>
-                            <h3>Otros Gastos</h3>
-                            <p>Registrar gastos adicionales del proyecto</p>
-                        </a>
-                    </div>
-                </div>
+                  <!-- Acciones Rápidas -->
+                  <div class="quick-actions-section">
+                      <h2 class="section-title">Acciones Rápidas</h2>
+                      <div class="quick-actions-grid">
+                          <a href="empleados.html" class="quick-action-card">
+                              <div class="action-icon">
+                                  <img src="../storage/vectors/user-svgrepo-com.svg" alt="Empleados" class="action-icon-img">
+                              </div>
+                              <h3>Gestionar Empleados</h3>
+                              <p>Crear, editar y administrar empleados del proyecto</p>
+                          </a>
+                          
+                          <a href="materiales.html" class="quick-action-card">
+                              <div class="action-icon">
+                                  <img src="../storage/vectors/layers-svgrepo-com.svg" alt="Materiales" class="action-icon-img">
+                              </div>
+                              <h3>Gestionar Materiales</h3>
+                              <p>Administrar inventario y costos de materiales</p>
+                          </a>
+                          
+                          <a href="tareas.html" class="quick-action-card">
+                              <div class="action-icon">
+                                  <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="Tareas" class="action-icon-img">
+                              </div>
+                              <h3>Gestionar Tareas</h3>
+                              <p>Organizar y asignar tareas del proyecto</p>
+                          </a>
+                          
+                          <a href="otros-gastos.html" class="quick-action-card">
+                              <div class="action-icon">
+                                  <img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="Gastos" class="action-icon-img">
+                              </div>
+                              <h3>Otros Gastos</h3>
+                              <p>Registrar gastos adicionales del proyecto</p>
+                          </a>
+                      </div>
+                  </div>
+
+                  <!-- Project Dashboard -->
+                  <div class="stats-section">
+                      <h2 class="section-title">Dashboard del Proyecto</h2>
+                     <div class="dashboard-grid">
+                         <!-- Duración del trabajo -->
+                         <div class="card">
+                             <h3>Duración de Tareas</h3>
+                             <div class="duration-chart" id="durationChart"></div>
+                             <div class="total-duration">
+                                 <span>Total: </span>
+                                 <span id="totalDuration">0</span>
+                                 <span> días</span>
+                             </div>
+                         </div>
+
+                         <!-- Empleados -->
+                         <div class="card">
+                             <h3>Salario adquirido por empleado</h3>
+                             <div class="team-list" id="teamList"></div>
+                         </div>
+
+                         <!-- Materiales -->
+                         <div class="card">
+                             <h3>Listado de Materiales</h3>
+                             <div class="materials-list" id="materialsList"></div>
+                         </div>
+
+                         <!-- Costos extra -->
+                         <div class="card">
+                             <h3>Listado de Gastos Extra</h3>
+                             <div class="extra-costs-list" id="extraCostsList"></div>
+                         </div>
+
+                         <!-- Costos -->
+                         <div class="card">
+                             <h3>Contador de Costos</h3>
+                             <div class="cost-chart" id="costChart"></div>
+                             <div class="cost-difference">
+                                 <div class="difference-bar">
+                                     <span>Diferencia</span>
+                                     <span id="costDifference">$0</span>
+                                 </div>
+                             </div>
+                         </div>
+
+                         <!-- Distribución de Costos -->
+                         <div class="card">
+                             <h3>Distribución de Costos Totales del Proyecto</h3>
+                             <div class="pie-chart-container">
+                                 <canvas id="costPieChart" width="300" height="300"></canvas>
+                                 <div class="pie-chart-legend" id="pieChartLegend"></div>
+                             </div>
+                         </div>
+
+                         <!-- Dashboard 1 -->
+                         <div class="card">
+                             <h3>Listado de Gastos Extra (Clon)</h3>
+                             <div class="extra-costs-list" id="extraCostsListClone">
+                                 <!-- Contenido se llenará dinámicamente -->
+                             </div>
+                         </div>
+
+                         <!-- Dashboard 2 -->
+                         <div class="card">
+                             <h3>Contador de Costos (Clon)</h3>
+                             <div class="cost-chart" id="costChartClone"></div>
+                             <div class="cost-difference">
+                                 <div class="difference-bar">
+                                     <span>Diferencia</span>
+                                     <span id="costDifferenceClone">$0</span>
+                                 </div>
+                             </div>
+                         </div>
+
+                         <!-- Dashboard 3 -->
+                         <div class="card">
+                             <h3>Distribución de Costos Totales del Proyecto (Clon)</h3>
+                             <div class="pie-chart-container">
+                                 <canvas id="costPieChartClone" width="300" height="300"></canvas>
+                                 <div class="pie-chart-legend" id="pieChartLegendClone"></div>
+                             </div>
+                         </div>
+                     </div>
+                     
+                     <!-- Botón de actualización manual -->
+                     <div class="dashboard-actions">
+                         <button onclick="actualizarDashboardManual()" class="button button-primary refresh-button">
+                             <img src="../storage/vectors/refresh-svgrepo-com.svg" alt="Actualizar" class="button-icon">
+                             Actualizar Dashboard
+                         </button>
+                     </div>
+                     </div>
+                 </div>
 
 
             </div>
@@ -462,31 +537,516 @@
         // Inicializar dashboard
         document.addEventListener('DOMContentLoaded', function() {
             cargarEstadisticasDashboard();
+            initializeProjectDashboard();
         });
 
-        // Actualizar estadísticas cuando la página se vuelve visible
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden) {
-                cargarEstadisticasDashboard();
+        // ===== FUNCIONES DEL DASHBOARD DEL PROYECTO =====
+        
+        // Función principal para inicializar el dashboard del proyecto
+        function initializeProjectDashboard() {
+            // Cargar datos desde localStorage
+            let empleados = JSON.parse(localStorage.getItem('empleadosCreados')) || [];
+            let materiales = JSON.parse(localStorage.getItem('materialesCreados')) || [];
+            let tareas = JSON.parse(localStorage.getItem('tareasCreadas')) || [];
+            let otrosGastos = JSON.parse(localStorage.getItem('otrosGastosCreados')) || [];
+            
+            // Recrear instancias de la clase Personal para que tengan sus métodos
+            empleados = empleados.map(item => {
+                const empleadoData = item.empleado;
+                // Recrear la instancia de Personal con los datos guardados
+                const empleadoRecreado = new Personal(
+                    empleadoData.nombre,
+                    empleadoData.costoPorHora,
+                    empleadoData.costoPorHoraExtra
+                );
+                // Restaurar las horas trabajadas
+                empleadoRecreado.horasTrabajadas = empleadoData.horasTrabajadas;
+                
+                return {
+                    empleado: empleadoRecreado,
+                    fechaCreacion: new Date(item.fechaCreacion),
+                    id: item.id
+                };
+            });
+
+            // Recrear instancias de la clase Material para que tengan sus métodos
+            materiales = materiales.map(item => {
+                const materialData = item.material;
+                // Recrear la instancia de Material con los datos guardados
+                const materialRecreado = new Material(
+                    materialData.nombreMaterial,
+                    materialData.costoPorUnidad,
+                    materialData.inventario
+                );
+                
+                return {
+                    material: materialRecreado,
+                    fechaCreacion: new Date(item.fechaCreacion),
+                    id: item.id
+                };
+            });
+
+            // Recrear instancias de la clase OtrosGastos para que tengan sus métodos
+            otrosGastos = otrosGastos.map(item => {
+                const gastoData = item.otroGasto;
+                // Recrear la instancia de OtrosGastos con los datos guardados
+                const gastoRecreado = new OtrosGastos(
+                    gastoData.nombre,
+                    gastoData.costoPorUnidad,
+                    gastoData.descripcion || ''
+                );
+                
+                return {
+                    otroGasto: gastoRecreado,
+                    fechaCreacion: new Date(item.fechaCreacion),
+                    id: item.id
+                };
+            });
+
+            // Recrear instancias de la clase Tarea para que tengan sus métodos
+            tareas = tareas.map(item => {
+                const tareaData = item.tarea;
+                
+                // Recrear la instancia de Tarea con los datos básicos
+                const tareaRecreada = new Tarea(
+                    tareaData.nombre,
+                    null, // personal se asignará después
+                    null, // materiales se asignarán después
+                    null, // otrosGastos se asignarán después
+                    tareaData.duracion
+                );
+                
+                // Restaurar el estado
+                tareaRecreada.estado = tareaData.estado;
+                tareaRecreada.fechaCreacion = new Date(tareaData.fechaCreacion);
+                
+                // Restaurar personal asignado
+                if (tareaData.personal && tareaData.personal.length > 0) {
+                    const personalRecreado = tareaData.personal.map(personalData => {
+                        return empleados.find(emp => emp.empleado.nombre === personalData.nombre)?.empleado;
+                    }).filter(Boolean);
+                    tareaRecreada.personal = personalRecreado;
+                }
+                
+                // Restaurar materiales asignados
+                if (tareaData.materiales && tareaData.materiales.length > 0) {
+                    const materialesRecreados = tareaData.materiales.map(materialData => {
+                        return materiales.find(mat => mat.material.nombreMaterial === materialData.nombreMaterial)?.material;
+                    }).filter(Boolean);
+                    tareaRecreada.materiales = materialesRecreados;
+                }
+                
+                // Restaurar otros gastos asignados
+                if (tareaData.otrosGastos && tareaData.otrosGastos.length > 0) {
+                    const gastosRecreados = tareaData.otrosGastos.map(gastoData => {
+                        return otrosGastos.find(gasto => gasto.otroGasto.nombre === gastoData.nombre)?.otroGasto;
+                    }).filter(Boolean);
+                    tareaRecreada.otrosGastos = gastosRecreados;
+                }
+                
+                return {
+                    tarea: tareaRecreada,
+                    fechaCreacion: new Date(item.fechaCreacion),
+                    id: item.id
+                };
+            });
+            
+            // Preparar datos para el dashboard
+            const projectData = {
+                duration: tareas.map(tarea => ({ duration: tarea.tarea.duracion || 0 })),
+                employees: empleados.map(emp => ({ 
+                    name: emp.empleado.nombre, 
+                    salary: emp.empleado.calcularSalarioTotal() 
+                })),
+                materials: materiales.map(mat => ({ 
+                    name: mat.material.nombreMaterial,
+                    costoUnitario: mat.material.costoPorUnidad,
+                    cantidad: mat.material.inventario,
+                    valorTotal: mat.material.costoPorUnidad * mat.material.inventario
+                })),
+                extraCosts: otrosGastos.map(gasto => ({ 
+                    name: gasto.otroGasto.nombre, 
+                    value: gasto.otroGasto.costoPorUnidad 
+                })),
+                realCost: calcularCostoReal(tareas),
+                totalCost: calcularCostoTotal(tareas, empleados, materiales, otrosGastos)
+            };
+            
+            // Renderizar cada sección del dashboard
+            renderDurationChart(projectData.duration);
+            renderTeamMembers(projectData.employees);
+            renderMaterials(projectData.materials);
+            renderExtraCosts(projectData.extraCosts);
+            renderCostChart(projectData.realCost, projectData.totalCost);
+            renderPieChart(empleados, materiales, otrosGastos);
+        }
+
+        // Calcular costo real (solo tareas completadas)
+        function calcularCostoReal(tareas) {
+            return tareas.reduce((total, item) => {
+                if (item.tarea.estado === 'completada') {
+                    return total + item.tarea.calcularCostoTotal();
+                }
+                return total;
+            }, 0);
+        }
+
+        // Calcular costo total (todas las tareas)
+        function calcularCostoTotal(tareas, empleados, materiales, otrosGastos) {
+            return tareas.reduce((total, item) => {
+                return total + item.tarea.calcularCostoTotal();
+            }, 0);
+        }
+
+        // Renderizar gráfico de duración de tareas
+        function renderDurationChart(tasks) {
+            const durationChart = document.getElementById('durationChart');
+            const totalDurationElement = document.getElementById('totalDuration');
+            
+            if (!durationChart) return;
+            
+            durationChart.innerHTML = '';
+            
+            let totalDuration = 0;
+            const maxDuration = Math.max(...tasks.map(task => task.duration || 0), 1);
+            
+            tasks.forEach((task, index) => {
+                const taskBar = document.createElement('div');
+                taskBar.className = 'task-bar';
+                
+                const taskLabel = document.createElement('div');
+                taskLabel.className = 'task-label';
+                taskLabel.textContent = `Tarea ${index + 1}`;
+                
+                const taskProgress = document.createElement('div');
+                taskProgress.className = 'task-progress';
+                
+                const taskProgressFill = document.createElement('div');
+                taskProgressFill.className = 'task-progress-fill';
+                const percentage = ((task.duration || 0) / maxDuration) * 100;
+                taskProgressFill.style.width = '0%';
+                
+                // Aplicar color basado en la duración de la tarea
+                const duration = task.duration || 0;
+                if (duration >= 30) {
+                    // Rojo para tareas de 30 días o más
+                    taskProgressFill.style.background = 'linear-gradient(90deg, #e74c3c, #c0392b)';
+                } else if (duration >= 14) {
+                    // Amarillo para tareas de 14 días o más
+                    taskProgressFill.style.background = 'linear-gradient(90deg, #f39c12, #e67e22)';
+                } else {
+                    // Verde para tareas de menos de 14 días
+                    taskProgressFill.style.background = 'linear-gradient(90deg, #27ae60, #2ecc71)';
+                }
+                
+                const taskValue = document.createElement('div');
+                taskValue.className = 'task-value';
+                taskValue.textContent = `${task.duration || 0} días`;
+                
+                taskProgress.appendChild(taskProgressFill);
+                taskBar.appendChild(taskLabel);
+                taskBar.appendChild(taskProgress);
+                taskBar.appendChild(taskValue);
+                durationChart.appendChild(taskBar);
+                
+                totalDuration += task.duration || 0;
+                
+                // Animar la barra después de un pequeño delay
+                setTimeout(() => {
+                    taskProgressFill.style.width = `${percentage}%`;
+                }, index * 200);
+            });
+            
+            if (totalDurationElement) {
+                totalDurationElement.textContent = totalDuration;
             }
-        });
+        }
 
-        // Actualizar estadísticas cuando se enfoca la ventana
-        window.addEventListener('focus', function() {
+        // Renderizar lista de empleados
+        function renderTeamMembers(employees) {
+            const teamList = document.getElementById('teamList');
+            
+            if (!teamList) return;
+            
+            teamList.innerHTML = '';
+            
+            let totalSalarios = 0;
+            
+            employees.forEach(employee => {
+                const teamMember = document.createElement('div');
+                teamMember.className = 'team-member';
+                
+                const memberName = document.createElement('div');
+                memberName.className = 'team-member-name';
+                memberName.textContent = employee.name || 'Empleado';
+                
+                // Crear barra de progreso para el salario
+                const salaryProgress = document.createElement('div');
+                salaryProgress.className = 'salary-progress';
+                
+                const salaryProgressFill = document.createElement('div');
+                salaryProgressFill.className = 'salary-progress-fill';
+                
+                // Calcular el porcentaje basado en el salario (0-1000)
+                const salary = employee.salary || 0;
+                totalSalarios += salary;
+                const percentage = Math.min((salary / 1000) * 100, 100);
+                salaryProgressFill.style.width = '0%';
+                
+                // Cambiar color a rojo si el salario supera $1000
+                if (salary > 1000) {
+                    salaryProgressFill.style.background = 'linear-gradient(90deg, #e74c3c, #c0392b)';
+                }
+                
+                const memberSalary = document.createElement('div');
+                memberSalary.className = 'team-member-salary';
+                memberSalary.textContent = `$${salary}`;
+                
+                salaryProgress.appendChild(salaryProgressFill);
+                teamMember.appendChild(memberName);
+                teamMember.appendChild(salaryProgress);
+                teamMember.appendChild(memberSalary);
+                teamList.appendChild(teamMember);
+                
+                // Animar la barra después de un pequeño delay
+                setTimeout(() => {
+                    salaryProgressFill.style.width = `${percentage}%`;
+                }, 200);
+            });
+            
+            // Agregar el total al final
+            if (employees.length > 0) {
+                const totalDiv = document.createElement('div');
+                totalDiv.className = 'team-total';
+                totalDiv.style.cssText = `
+                    margin-top: 15px;
+                    padding: 12px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    text-align: center;
+                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+                `;
+                totalDiv.textContent = `Total Dinero pagado a empleados: $${totalSalarios.toFixed(2)}`;
+                teamList.appendChild(totalDiv);
+            }
+        }
+
+        // Renderizar lista de materiales
+        function renderMaterials(materials) {
+            const materialsList = document.getElementById('materialsList');
+            
+            if (!materialsList) return;
+            
+            materialsList.innerHTML = '';
+            
+            materials.forEach(material => {
+                const materialItem = document.createElement('div');
+                materialItem.className = 'material-item';
+                
+                // Información resumida en una sola línea
+                const materialInfo = document.createElement('div');
+                materialInfo.className = 'material-info-compact';
+                materialInfo.innerHTML = `
+                    <span class="material-name">${material.name || material}</span>
+                    <span class="material-details">
+                        <span class="detail">$${material.costoUnitario || 0}/u</span>
+                        <span class="detail">${material.cantidad || 0} un</span>
+                        <span class="detail total">$${material.valorTotal || 0}</span>
+                    </span>
+                `;
+                
+                materialItem.appendChild(materialInfo);
+                materialsList.appendChild(materialItem);
+            });
+        }
+
+        // Renderizar lista de costos extra
+        function renderExtraCosts(extraCosts) {
+            const extraCostsList = document.getElementById('extraCostsList');
+            
+            if (!extraCostsList) return;
+            
+            extraCostsList.innerHTML = '';
+            
+            extraCosts.forEach(cost => {
+                const costItem = document.createElement('div');
+                costItem.className = 'extra-cost-item';
+                
+                const costName = document.createElement('div');
+                costName.className = 'extra-cost-name';
+                costName.textContent = cost.name || cost;
+                
+                const costValue = document.createElement('div');
+                costValue.className = 'extra-cost-value';
+                costValue.textContent = cost.value ? `$${cost.value}` : '';
+                
+                costItem.appendChild(costName);
+                costItem.appendChild(costValue);
+                extraCostsList.appendChild(costItem);
+            });
+        }
+
+        // Renderizar gráfico de costos
+        function renderCostChart(realCost, totalCost) {
+            const costChart = document.getElementById('costChart');
+            const costDifference = document.getElementById('costDifference');
+            
+            if (!costChart) return;
+            
+            costChart.innerHTML = '';
+            
+            const maxCost = Math.max(realCost, totalCost, 1);
+            const difference = totalCost - realCost;
+            
+            // Barra de costo total (PRIMERO)
+            const totalCostBar = document.createElement('div');
+            totalCostBar.className = 'cost-bar';
+            
+            const totalCostLabel = document.createElement('div');
+            totalCostLabel.className = 'cost-label';
+            totalCostLabel.textContent = 'Costo Total';
+            
+            const totalCostProgress = document.createElement('div');
+            totalCostProgress.className = 'cost-progress';
+            
+            const totalCostProgressFill = document.createElement('div');
+            totalCostProgressFill.className = 'cost-progress-fill total';
+            const totalPercentage = (totalCost / maxCost) * 100;
+            totalCostProgressFill.style.width = '0%';
+            
+            const totalCostValue = document.createElement('div');
+            totalCostValue.className = 'cost-value';
+            totalCostValue.textContent = `$${totalCost.toLocaleString()}`;
+            
+            totalCostProgress.appendChild(totalCostProgressFill);
+            totalCostBar.appendChild(totalCostLabel);
+            totalCostBar.appendChild(totalCostProgress);
+            totalCostBar.appendChild(totalCostValue);
+            costChart.appendChild(totalCostBar);
+            
+            // Barra de costo real (SEGUNDO)
+            const realCostBar = document.createElement('div');
+            realCostBar.className = 'cost-bar';
+            
+            const realCostLabel = document.createElement('div');
+            realCostLabel.className = 'cost-label';
+            realCostLabel.textContent = 'Costo Real';
+            
+            const realCostProgress = document.createElement('div');
+            realCostProgress.className = 'cost-progress';
+            
+            const realCostProgressFill = document.createElement('div');
+            realCostProgressFill.className = 'cost-progress-fill real';
+            const realPercentage = (realCost / maxCost) * 100;
+            realCostProgressFill.style.width = '0%';
+            
+            const realCostValue = document.createElement('div');
+            realCostValue.className = 'cost-value';
+            realCostValue.textContent = `$${realCost.toLocaleString()}`;
+            
+            realCostProgress.appendChild(realCostProgressFill);
+            realCostBar.appendChild(realCostLabel);
+            realCostBar.appendChild(realCostProgress);
+            realCostBar.appendChild(realCostValue);
+            costChart.appendChild(realCostBar);
+            
+            // Animar las barras
+            setTimeout(() => {
+                totalCostProgressFill.style.width = `${totalPercentage}%`;
+            }, 300);
+            
+            setTimeout(() => {
+                realCostProgressFill.style.width = `${realPercentage}%`;
+            }, 600);
+            
+            // Actualizar diferencia
+            if (costDifference) {
+                costDifference.textContent = `$${difference.toLocaleString()}`;
+            }
+        }
+
+        // Renderizar gráfica de torta de distribución de costos
+        function renderPieChart(empleados, materiales, otrosGastos) {
+            const canvas = document.getElementById('costPieChart');
+            const legendContainer = document.getElementById('pieChartLegend');
+            if (!canvas || !legendContainer) return;
+
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar canvas
+
+            // Calcular costos totales por categoría
+            let totalSalarios = empleados.reduce((sum, item) => sum + item.empleado.calcularSalarioTotal(), 0);
+            let totalMateriales = materiales.reduce((sum, item) => sum + (item.material.costoPorUnidad * item.material.inventario), 0);
+            let totalOtrosGastos = otrosGastos.reduce((sum, item) => sum + item.otroGasto.costoPorUnidad, 0);
+
+            const totalProyecto = totalSalarios + totalMateriales + totalOtrosGastos;
+
+            const data = [
+                { label: 'Salarios de Empleados', value: totalSalarios, color: '#3498db' },
+                { label: 'Costo de Materiales', value: totalMateriales, color: '#2ecc71' },
+                { label: 'Gastos Extras', value: totalOtrosGastos, color: '#e74c3c' }
+            ];
+
+            let startAngle = 0;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 10; // Dejar un pequeño margen
+
+            legendContainer.innerHTML = ''; // Limpiar leyenda
+
+            data.forEach(segment => {
+                const sliceAngle = (segment.value / totalProyecto) * 2 * Math.PI;
+
+                // Dibujar segmento
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+                ctx.closePath();
+                ctx.fillStyle = segment.color;
+                ctx.fill();
+
+                // Dibujar borde (opcional, para separación)
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Crear elemento de leyenda
+                const percentage = totalProyecto > 0 ? ((segment.value / totalProyecto) * 100).toFixed(1) : 0;
+                const legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+                legendItem.innerHTML = `
+                    <div class="legend-color" style="background-color: ${segment.color};"></div>
+                    <div class="legend-label">${segment.label}</div>
+                    <div class="legend-value">$${segment.value.toFixed(2)}</div>
+                    <div class="legend-percentage">${percentage}%</div>
+                `;
+                legendContainer.appendChild(legendItem);
+
+                startAngle += sliceAngle;
+            });
+        }
+
+        // Función para actualización manual del dashboard
+        function actualizarDashboardManual() {
             cargarEstadisticasDashboard();
-        });
+            initializeProjectDashboard();
+            
+            // Efecto visual de actualización
+            const refreshButton = document.querySelector('.refresh-button');
+            if (refreshButton) {
+                refreshButton.style.transform = 'rotate(360deg)';
+                setTimeout(() => {
+                    refreshButton.style.transform = 'rotate(0deg)';
+                }, 500);
+            }
+        }
 
-        // Actualizar estadísticas cada 1 segundo
-        setInterval(cargarEstadisticasDashboard, 1000);
-
-        // Actualizar estadísticas cuando se hace clic en cualquier lugar
-        document.addEventListener('click', function() {
+        // Inicializar el dashboard cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
             cargarEstadisticasDashboard();
-        });
-
-        // Actualizar estadísticas cuando se presiona cualquier tecla
-        document.addEventListener('keydown', function() {
-            cargarEstadisticasDashboard();
+            initializeProjectDashboard();
         });
     </script>
 </body>
