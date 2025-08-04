@@ -516,9 +516,7 @@ let configuracionGlobal = {
         costoPorUnidad: { minimo: 1, maximo: 1000 },
         costoOtrosGastos: { minimo: 1, maximo: 500 }
     },
-    validacion: { estricta: true, mostrarConsejos: true, caracteresProhibidos: `!"·$%&/()=?¿'¡+\`*]^[´.:,;-_{}<>\`~\\|` },
-    interfaz: { tema: 'default', animaciones: true, idioma: 'es' },
-    datos: { autoguardado: true, backupAutomatico: true }
+    validacion: { estricta: true, mostrarConsejos: true, caracteresProhibidos: `!"·$%&/()=?¿'¡+\`*]^[´.:,;-_{}<>\`~\\|` }
 };
 
 function abrirModalConfiguracion() {
@@ -576,11 +574,17 @@ function aplicarConfiguracionRangosEmpleados() {
     
     // Validar rangos de empleados únicamente
     if (costoPorHoraMin >= costoPorHoraMax) {
-        alert("⚠️ Error: El costo por hora mínimo debe ser menor que el máximo");
+        // Mostrar error visual en el campo
+        const input = document.getElementById('costoPorHoraMax');
+        input.classList.add('invalid');
+        input.style.borderColor = '#e74c3c';
         return;
     }
     if (costoPorHoraExtraMin >= costoPorHoraExtraMax) {
-        alert("⚠️ Error: El costo por hora extra mínimo debe ser menor que el máximo");
+        // Mostrar error visual en el campo
+        const input = document.getElementById('costoPorHoraExtraMax');
+        input.classList.add('invalid');
+        input.style.borderColor = '#e74c3c';
         return;
     }
     
@@ -596,39 +600,33 @@ function aplicarConfiguracionRangosEmpleados() {
     
     actualizarRangosActualesMostrados();
     
-    alert(`✅ Configuración de rangos para empleados aplicada exitosamente:\n\n` +
-          `Costo por hora: $${costoPorHoraMin.toFixed(2)} - $${costoPorHoraMax.toFixed(2)}\n` +
-          `Hora extra: $${costoPorHoraExtraMin.toFixed(2)} - $${costoPorHoraExtraMax.toFixed(2)}\n\n` +
-          `Los cambios se aplicarán inmediatamente en la sección de empleados.`);
+    // Mostrar confirmación visual
+    const inputs = [
+        document.getElementById('costoPorHoraMin'),
+        document.getElementById('costoPorHoraMax'),
+        document.getElementById('costoPorHoraExtraMin'),
+        document.getElementById('costoPorHoraExtraMax')
+    ];
+    
+    inputs.forEach(input => {
+        input.classList.remove('invalid');
+        input.classList.add('valid');
+        input.style.borderColor = '#27ae60';
+    });
+    
+    // Cerrar el modal después de un breve delay
+    setTimeout(() => {
+        cerrarModalConfiguracion();
+    }, 1000);
 }
 
 function aplicarConfiguracionValidacion() {
     alert('✅ Configuración de validación aplicada');
 }
 
-function aplicarConfiguracionInterfaz() {
-    alert('✅ Configuración de interfaz aplicada');
-}
 
-function exportarConfiguracion() {
-    alert('📤 Configuración exportada');
-}
 
-function importarConfiguracion() {
-    alert('📥 Función de importación');
-}
 
-function resetearConfiguracion() {
-    alert('🔄 Configuración restaurada');
-}
-
-function limpiarDatosSistema() {
-    alert('Datos del sistema eliminados');
-}
-
-function actualizarEstadisticasSistemaConfig() {
-    document.getElementById('estadisticasSistema').innerHTML = '<p>Estadísticas del sistema</p>';
-}
 
 // ===== INICIALIZACIÓN DEL SISTEMA =====
 

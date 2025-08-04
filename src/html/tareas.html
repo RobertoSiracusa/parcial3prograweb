@@ -14,7 +14,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div class="logo">
+                <div class="logo" onclick="toggleSidebar()" style="cursor: pointer;">
                     <img src="../storage/vectors/browser-svgrepo-com.svg" alt="Logo" class="logo-icon">
                     <span class="logo-text">Panel de Control</span>
                 </div>
@@ -71,12 +71,7 @@
                     <h1 class="page-title">Gestión de Tareas</h1>
                     <p class="page-subtitle">Administra y gestiona las tareas del proyecto</p>
                 </div>
-                <div class="header-right">
-                    <div class="user-info">
-                        <img src="../storage/vectors/portrait-user-svgrepo-com.svg" alt="Usuario" class="user-avatar">
-                        <span class="user-name">Administrador</span>
-                    </div>
-                </div>
+                
             </header>
 
             <!-- Dashboard Content -->
@@ -259,22 +254,22 @@
                                 <img src="../storage/vectors/clock-svgrepo-com.svg" alt="" class="input-icon">
                                 Duración Mínima (horas):
                             </label>
-                            <input type="number" id="duracionMinimaTarea" value="0.5" step="0.1" min="0">
+                            <input type="number" id="duracionMinimaTarea" value="0.5" step="0.1" min="0" oninput="validarRangoConfiguracionTareas()">
                         </div>
                         <div class="input-group">
                             <label for="duracionMaximaTarea">
                                 <img src="../storage/vectors/clock-svgrepo-com.svg" alt="" class="input-icon">
                                 Duración Máxima (horas):
                             </label>
-                            <input type="number" id="duracionMaximaTarea" value="40" step="0.1" min="0">
+                            <input type="number" id="duracionMaximaTarea" value="40" step="0.1" min="0" oninput="validarRangoConfiguracionTareas()">
                         </div>
                     </div>
                     
                     <div class="info-note">
                         <strong><img src="../storage/vectors/traffic-light-svgrepo-com.svg" alt="" class="traffic-light-icon"> Nota:</strong> Estos rangos se aplicarán específicamente a las tareas:<br>
-                        <strong>⏱️ Duración:</strong> Tiempo permitido para las tareas<br>
+                        <strong><img src="../storage/vectors/clock-svgrepo-com.svg" alt="" class="input-icon"> Duración:</strong> Tiempo permitido para las tareas<br>
                         <strong>Validación:</strong> Se validará al crear o editar tareas<br>
-                        <strong>⚡ Aplicación:</strong> Los cambios se aplicarán inmediatamente
+                        <strong><img src="../storage/vectors/lightbulb-alt-svgrepo-com.svg" alt="" class="input-icon"> Aplicación:</strong> Los cambios se aplicarán inmediatamente
                     </div>
                     
                     <div class="range-display-container">
@@ -284,139 +279,21 @@
                         </div>
                     </div>
                     
-                    <button onclick="aplicarConfiguracionTareas()" class="button button-success">
+                    <button id="btnAplicarConfiguracionTareas" onclick="aplicarConfiguracionTareas()" class="button button-success" disabled>
                         <img src="../storage/vectors/circle-check-svgrepo-com.svg" alt="" class="button-icon">
                         Aplicar Configuración de Tareas
                     </button>
                 </div>
 
-                <div class="config-panel">
-                    <h2><img src="../storage/vectors/equalizer-svgrepo-com.svg" alt="" class="equalizer-icon-large">Configuración de Validación</h2>
-                    <div class="config-grid">
-                        <div class="input-group">
-                            <label for="validacionEstricta">
-                                <img src="../storage/vectors/alarm-exclamation-svgrepo-com.svg" alt="" class="input-icon">
-                                Validación Estricta de Nombres:
-                            </label>
-                            <select id="validacionEstricta">
-                                <option value="true">Activada (Recomendado)</option>
-                                <option value="false">Desactivada</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="mostrarConsejos">
-                                <img src="../storage/vectors/info-svgrepo-com.svg" alt="" class="input-icon">
-                                Mostrar Consejos de Validación:
-                            </label>
-                            <select id="mostrarConsejos">
-                                <option value="true">Activado</option>
-                                <option value="false">Desactivado</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button onclick="aplicarConfiguracionValidacion()" class="button button-success">
-                        <img src="../storage/vectors/circle-check-svgrepo-com.svg" alt="" class="button-icon">
-                        Aplicar Configuración de Validación
-                    </button>
-                </div>
 
-                <div class="config-panel">
-                    <h2><img src="../storage/vectors/browser-svgrepo-com.svg" alt="" class="browser-icon-large">Configuración de Interfaz</h2>
-                    <div class="config-grid">
-                        <div class="input-group">
-                            <label for="temaInterfaz">
-                                <img src="../storage/vectors/palette-svgrepo-com.svg" alt="" class="input-icon">
-                                Tema de Interfaz:
-                            </label>
-                            <select id="temaInterfaz">
-                                <option value="default">Por Defecto</option>
-                                <option value="dark">Oscuro</option>
-                                <option value="light">Claro</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="animaciones">
-                                <img src="../storage/vectors/sparkles-svgrepo-com.svg" alt="" class="input-icon">
-                                Animaciones:
-                            </label>
-                            <select id="animaciones">
-                                <option value="true">Activadas</option>
-                                <option value="false">Desactivadas</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="idioma">
-                                <img src="../storage/vectors/globe-svgrepo-com.svg" alt="" class="input-icon">
-                                Idioma:
-                            </label>
-                            <select id="idioma">
-                                <option value="es">Español</option>
-                                <option value="en">Inglés</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button onclick="aplicarConfiguracionInterfaz()" class="button button-success">
-                        <img src="../storage/vectors/circle-check-svgrepo-com.svg" alt="" class="button-icon">
-                        Aplicar Configuración de Interfaz
-                    </button>
-                </div>
 
-                <div class="config-panel">
-                    <h2><img src="../storage/vectors/database-svgrepo-com.svg" alt="" class="database-icon-large">Gestión de Datos del Sistema</h2>
-                    <div class="config-grid">
-                        <div class="input-group">
-                            <label for="autoguardado">
-                                <img src="../storage/vectors/save-svgrepo-com.svg" alt="" class="input-icon">
-                                Autoguardado de Datos:
-                            </label>
-                            <select id="autoguardado">
-                                <option value="true">Activado</option>
-                                <option value="false">Desactivado</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="backupAutomatico">
-                                <img src="../storage/vectors/cloud-svgrepo-com.svg" alt="" class="input-icon">
-                                Backup Automático:
-                            </label>
-                            <select id="backupAutomatico">
-                                <option value="true">Activado</option>
-                                <option value="false">Desactivado</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="buttons-section">
-                        <button onclick="exportarConfiguracion()" class="button button-info">
-                            <img src="../storage/vectors/download-svgrepo-com.svg" alt="" class="button-icon">
-                            Exportar Configuración
-                        </button>
-                        <button onclick="resetearConfiguracion()" class="button button-warning">
-                            <img src="../storage/vectors/refresh-ccw-clock-svgrepo-com.svg" alt="" class="button-icon">
-                            Resetear Configuración
-                        </button>
-                        <button onclick="limpiarDatosSistema()" class="button button-danger">
-                            <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="button-icon">
-                            Limpiar Todos los Datos
-                        </button>
-                    </div>
-                </div>
 
-                <div class="config-panel">
-                    <h2><img src="../storage/vectors/stats-svgrepo-com.svg" alt="" class="stats-icon-large">Estadísticas del Sistema</h2>
-                    <div id="estadisticasSistema" class="stats-panel">
-                        <!-- Estadísticas se llenarán aquí -->
-                    </div>
-                    <button onclick="actualizarEstadisticasSistemaConfig()" class="button">
-                        <img src="../storage/vectors/refresh-ccw-clock-svgrepo-com.svg" alt="" class="button-icon">
-                        Actualizar Estadísticas
-                    </button>
-                </div>
+
+
             </div>
             <div class="modal-footer">
                 <div class="buttons-section">
-                    <button onclick="cerrarModalConfiguracion()" class="button">
-                        Cerrar
-                    </button>
+                    
                 </div>
             </div>
         </div>
@@ -458,5 +335,13 @@
     <script src="../js/OtrosCostos.js"></script>
     <script src="../js/Tarea.js"></script>
     <script src="../js/tareas.js"></script>
+    
+    <script>
+        // Función para alternar el estado del sidebar
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+    </script>
 </body>
 </html>

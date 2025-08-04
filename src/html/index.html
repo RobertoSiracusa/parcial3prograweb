@@ -16,7 +16,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div class="logo">
+                <div class="logo" onclick="toggleSidebar()" style="cursor: pointer;">
                     <img src="../storage/vectors/browser-svgrepo-com.svg" alt="Logo" class="logo-icon">
                     <span class="logo-text">Panel de Control</span>
                 </div>
@@ -73,12 +73,7 @@
                     <h1 class="page-title">Dashboard</h1>
                     <p class="page-subtitle">Bienvenido al sistema de control de proyectos</p>
                 </div>
-                <div class="header-right">
-                    <div class="user-info">
-                        <img src="../storage/vectors/portrait-user-svgrepo-com.svg" alt="Usuario" class="user-avatar">
-                        <span class="user-name">Administrador</span>
-                    </div>
-                </div>
+                
             </header>
 
                                                    <!-- Dashboard Content -->
@@ -1592,6 +1587,12 @@
                     refreshButton.style.transform = 'rotate(0deg)';
                 }, 500);
             }
+        }
+
+        // Función para alternar el estado del sidebar
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
         }
 
         // Inicializar el dashboard cuando se carga la página

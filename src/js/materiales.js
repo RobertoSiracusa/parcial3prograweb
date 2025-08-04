@@ -468,12 +468,12 @@ function obtenerRangos(tipoRango = 'costoPorUnidad') {
 
 // Función para abrir el modal de crear material
 function crearMaterialPersonalizado() {
-    const rangosCostoPorUnidad = obtenerRangos('costoPorUnidad');
-    if (!rangosCostoPorUnidad) return;
+    // Obtener el máximo configurado globalmente
+    const maximoConfigurado = configuracionGlobal.maximoCosteMaterial || 1000;
     
     // Actualizar información de rango en el modal
     document.getElementById('rangoInfoMaterial').textContent = 
-        `$${rangosCostoPorUnidad.minimo.toFixed(2)} - $${rangosCostoPorUnidad.maximo.toFixed(2)}`;
+        `Máximo: $${maximoConfigurado.toFixed(2)}`;
     
     // Limpiar formulario y abrir modal
     limpiarFormularioMaterial();
@@ -518,15 +518,24 @@ function validarNombreMaterial(nombre) {
 
 // Función para validar costos con rangos específicos
 function validarCosto(costo, tipo, tipoRango = 'costoPorUnidad') {
-    const rangos = obtenerRangos(tipoRango);
-    if (!rangos) return "Error al obtener rangos de configuración";
-    
     if (isNaN(costo) || costo <= 0) {
         return `El ${tipo} debe ser un número positivo`;
     }
     
-    if (costo < rangos.minimo || costo > rangos.maximo) {
-        return `El ${tipo} debe estar entre $${rangos.minimo.toFixed(2)} y $${rangos.maximo.toFixed(2)}`;
+    // Para materiales, usar el máximo configurado globalmente
+    if (tipoRango === 'costoPorUnidad') {
+        const maximoConfigurado = configuracionGlobal.maximoCosteMaterial || 1000;
+        if (costo > maximoConfigurado) {
+            return `El ${tipo} no puede superar $${maximoConfigurado.toFixed(2)}`;
+        }
+    } else {
+        // Para otros tipos, usar los rangos existentes
+        const rangos = obtenerRangos(tipoRango);
+        if (!rangos) return "Error al obtener rangos de configuración";
+        
+        if (costo < rangos.minimo || costo > rangos.maximo) {
+            return `El ${tipo} debe estar entre $${rangos.minimo.toFixed(2)} y $${rangos.maximo.toFixed(2)}`;
+        }
     }
     
     return null; // Sin errores
@@ -573,9 +582,9 @@ function validarYCrearMaterial() {
     
     // Crear material
     try {
-        const rangos = obtenerRangos();
+        const maximoConfigurado = configuracionGlobal.maximoCosteMaterial || 1000;
         console.log("=== CREANDO MATERIAL DESDE MODAL ===");
-        console.log(`Rango: $${rangos.minimo} - $${rangos.maximo}`);
+        console.log(`Máximo configurado: $${maximoConfigurado}`);
         console.log(`Datos ingresados: ${nombre}, $${costoPorUnidad} (inventario inicial: 0)`);
         
         const material = new Material(nombre, costoPorUnidad, 0);
@@ -603,7 +612,8 @@ let configuracionGlobal = {
     },
     validacion: { estricta: true, mostrarConsejos: true, caracteresProhibidos: `!"·$%&/()=?¿'¡+\`*]^[´.:,;-_{}<>\`~\\|` },
     interfaz: { tema: 'default', animaciones: true, idioma: 'es' },
-    datos: { autoguardado: true, backupAutomatico: true }
+    datos: { autoguardado: true, backupAutomatico: true },
+    maximoCosteMaterial: 1000
 };
 
 function abrirModalConfiguracion() {
@@ -635,6 +645,9 @@ function actualizarInterfazConfiguracion() {
     document.getElementById('costoPorUnidadMin').value = configuracionGlobal.rangos.costoPorUnidad.minimo;
     document.getElementById('costoPorUnidadMax').value = configuracionGlobal.rangos.costoPorUnidad.maximo;
     
+    // Cargar valor del máximo coste de material
+    document.getElementById('maximoCosteMaterial').value = configuracionGlobal.maximoCosteMaterial;
+    
     actualizarRangosActualesMostrados();
 }
 
@@ -648,98 +661,40 @@ function actualizarRangosActualesMostrados() {
     `;
 }
 
-function aplicarConfiguracionRangosMateriales() {
-    const costoPorUnidadMin = parseFloat(document.getElementById('costoPorUnidadMin').value);
-    const costoPorUnidadMax = parseFloat(document.getElementById('costoPorUnidadMax').value);
+// Función para aplicar la configuración del máximo coste de material
+function aplicarConfiguracionMaximoCoste() {
+    const maximoCoste = parseFloat(document.getElementById('maximoCosteMaterial').value);
     
-    // Validar rangos de materiales únicamente
-    if (costoPorUnidadMin >= costoPorUnidadMax) {
-        alert("⚠️ Error: El costo por unidad mínimo debe ser menor que el máximo");
+    // Validar que el valor sea válido
+    if (isNaN(maximoCoste) || maximoCoste <= 0) {
+        // Mostrar error visual en el campo
+        const input = document.getElementById('maximoCosteMaterial');
+        input.classList.add('invalid');
+        input.style.borderColor = '#e74c3c';
         return;
     }
     
-    // Actualizar solo los rangos de materiales en la configuración global
-    configuracionGlobal.rangos.costoPorUnidad.minimo = costoPorUnidadMin;
-    configuracionGlobal.rangos.costoPorUnidad.maximo = costoPorUnidadMax;
+    // Actualizar la configuración global
+    configuracionGlobal.maximoCosteMaterial = maximoCoste;
     
     // Guardar en localStorage
     localStorage.setItem('configuracionSistema', JSON.stringify(configuracionGlobal));
-    localStorage.setItem('rangosEspecificos', JSON.stringify(configuracionGlobal.rangos));
     
-    actualizarRangosActualesMostrados();
+    // Mostrar confirmación visual
+    const input = document.getElementById('maximoCosteMaterial');
+    input.classList.remove('invalid');
+    input.classList.add('valid');
+    input.style.borderColor = '#27ae60';
     
-    alert(`✅ Configuración de rangos para materiales aplicada exitosamente:\n\n` +
-          `Materiales: $${costoPorUnidadMin.toFixed(2)} - $${costoPorUnidadMax.toFixed(2)}\n\n` +
-          `Los cambios se aplicarán inmediatamente en la sección de materiales.`);
+    // Cerrar el modal después de un breve delay
+    setTimeout(() => {
+        cerrarModalConfiguracion();
+    }, 1000);
 }
 
-function aplicarConfiguracionValidacion() {
-    alert('✅ Configuración de validación aplicada');
-}
 
-function exportarConfiguracion() {
-    alert('📤 Configuración exportada');
-}
 
-function resetearConfiguracion() {
-    alert('🔄 Configuración restaurada');
-}
 
-function limpiarDatosSistema() {
-    alert('Datos del sistema eliminados');
-}
-
-function actualizarEstadisticasSistemaConfig() {
-    const estadisticasDiv = document.getElementById('estadisticasSistema');
-    
-    // Calcular estadísticas del sistema
-    const totalMateriales = materialesCreados.length;
-    const costoPromedioUnidad = totalMateriales > 0 ? 
-        materialesCreados.reduce((sum, item) => sum + item.material.getCostoPorUnidad(), 0) / totalMateriales : 0;
-    const totalInventario = materialesCreados.reduce((sum, item) => sum + item.material.getInventario(), 0);
-    const valorTotalInventario = materialesCreados.reduce((sum, item) => sum + item.material.calcularValorTotal(), 0);
-    
-    estadisticasDiv.innerHTML = `
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="stat-icon-img">
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number">${totalMateriales}</div>
-                    <div class="stat-label">Total Materiales</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="stat-icon-img">
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number">$${costoPromedioUnidad.toFixed(2)}</div>
-                    <div class="stat-label">Promedio Costo/Unidad</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <img src="../storage/vectors/shapes-svgrepo-com.svg" alt="" class="stat-icon-img">
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number">${totalInventario}</div>
-                    <div class="stat-label">Total Unidades</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <img src="../storage/vectors/coins-svgrepo-com.svg" alt="" class="stat-icon-img">
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number">$${valorTotalInventario.toFixed(2)}</div>
-                    <div class="stat-label">Valor Total Inventario</div>
-                </div>
-            </div>
-        </div>
-    `;
-}
 
 // ===== INICIALIZACIÓN DEL SISTEMA =====
 

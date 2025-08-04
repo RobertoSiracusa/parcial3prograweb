@@ -14,7 +14,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div class="logo">
+                <div class="logo" onclick="toggleSidebar()" style="cursor: pointer;">
                     <img src="../storage/vectors/browser-svgrepo-com.svg" alt="Logo" class="logo-icon">
                     <span class="logo-text">Panel de Control</span>
                 </div>
@@ -69,12 +69,7 @@
                     <h1 class="page-title">Gestión de Otros Gastos</h1>
                     <p class="page-subtitle">Administra los gastos adicionales del proyecto</p>
                 </div>
-                <div class="header-right">
-                    <div class="user-info">
-                        <img src="../storage/vectors/portrait-user-svgrepo-com.svg" alt="Usuario" class="user-avatar">
-                        <span class="user-name">Administrador</span>
-                    </div>
-                </div>
+                
             </header>
 
             <!-- Dashboard Content -->
@@ -226,7 +221,7 @@
                                 <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="input-icon">
                                 Otros Gastos - Mínimo ($):
                             </label>
-                            <input type="number" id="costoOtrosGastosMin" step="0.01" min="0" value="1">
+                            <input type="number" id="costoOtrosGastosMin" step="0.01" min="0" value="1" oninput="validarRangoConfiguracion()">
                         </div>
                         
                         <div class="input-group">
@@ -234,7 +229,7 @@
                                 <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="input-icon">
                                 Otros Gastos - Máximo ($):
                             </label>
-                            <input type="number" id="costoOtrosGastosMax" step="0.01" min="0" value="500">
+                            <input type="number" id="costoOtrosGastosMax" step="0.01" min="0" value="500" oninput="validarRangoConfiguracion()">
                         </div>
                     </div>
                     
@@ -247,36 +242,13 @@
                     
                     <div class="buttons-section">
                         <button onclick="aplicarConfiguracionRangosOtrosGastos()" class="button button-success">
-                            <img src="../storage/vectors/save-svgrepo-com.svg" alt="" class="button-icon">
+                            <img src="../storage/vectors/floppy-disk-svgrepo-com.svg" alt="" class="button-icon">
                             Aplicar Configuración
                         </button>
                     </div>
                 </div>
                 
-                <div class="config-panel">
-                    <h2>
-                        <img src="../storage/vectors/stats-svgrepo-com.svg" alt="" class="config-icon">
-                        Estadísticas del Sistema
-                    </h2>
-                    <div id="estadisticasSistema" class="stats-panel">
-                        <!-- Estadísticas se llenarán aquí -->
-                    </div>
-                </div>
-            </div>
-            
-            <div class="modal-footer">
-                <button onclick="exportarConfiguracion()" class="button button-info">
-                    <img src="../storage/vectors/download-svgrepo-com.svg" alt="" class="button-icon">
-                    Exportar Configuración
-                </button>
-                <button onclick="resetearConfiguracion()" class="button button-warning">
-                    <img src="../storage/vectors/refresh-svgrepo-com.svg" alt="" class="button-icon">
-                    Restaurar Valores
-                </button>
-                <button onclick="cerrarModalConfiguracion()" class="button">
-                    <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="button-icon">
-                    Cerrar
-                </button>
+
             </div>
         </div>
     </div>
@@ -344,5 +316,13 @@
     <script src="../js/OtrosCostos.js"></script>
     <script src="../js/OtrosGastos.js"></script>
     <script src="../js/otros-gastos.js"></script>
+    
+    <script>
+        // Función para alternar el estado del sidebar
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+    </script>
 </body>
 </html>

@@ -495,7 +495,6 @@ function abrirModalConfiguracion() {
     cargarConfiguracionGlobal();
     document.getElementById('modalConfiguracion').style.display = 'block';
     actualizarInterfazConfiguracion();
-    actualizarEstadisticasSistemaConfig();
 }
 
 function cerrarModalConfiguracion() {
@@ -522,6 +521,9 @@ function actualizarInterfazConfiguracion() {
     document.getElementById('costoOtrosGastosMax').value = configuracionGlobal.rangos.costoOtrosGastos.maximo;
     
     actualizarRangosActualesMostrados();
+    
+    // Validar rangos al cargar la configuración
+    validarRangoConfiguracion();
 }
 
 function actualizarRangosActualesMostrados() {
@@ -534,13 +536,80 @@ function actualizarRangosActualesMostrados() {
     `;
 }
 
+// Función para validar rangos en tiempo real
+function validarRangoConfiguracion() {
+    const inputMin = document.getElementById('costoOtrosGastosMin');
+    const inputMax = document.getElementById('costoOtrosGastosMax');
+    const botonAplicar = document.querySelector('button[onclick="aplicarConfiguracionRangosOtrosGastos()"]');
+    
+    const valorMin = parseFloat(inputMin.value);
+    const valorMax = parseFloat(inputMax.value);
+    
+    // Resetear estilos
+    inputMin.classList.remove('invalid');
+    inputMax.classList.remove('invalid');
+    botonAplicar.disabled = false;
+    
+    let hayErrores = false;
+    
+    // Validar que no sean negativos
+    if (valorMin < 0) {
+        inputMin.classList.add('invalid');
+        hayErrores = true;
+    }
+    
+    if (valorMax < 0) {
+        inputMax.classList.add('invalid');
+        hayErrores = true;
+    }
+    
+    // Validar que el mínimo no sea mayor al máximo
+    if (valorMin > valorMax) {
+        inputMin.classList.add('invalid');
+        inputMax.classList.add('invalid');
+        hayErrores = true;
+    }
+    
+    // Validar que no sean iguales
+    if (valorMin === valorMax && valorMin !== 0) {
+        inputMin.classList.add('invalid');
+        inputMax.classList.add('invalid');
+        hayErrores = true;
+    }
+    
+    // Deshabilitar botón si hay errores
+    if (hayErrores) {
+        botonAplicar.disabled = true;
+    }
+    
+    // Actualizar la visualización de rangos
+    actualizarRangosActualesMostrados();
+}
+
 function aplicarConfiguracionRangosOtrosGastos() {
     const costoOtrosGastosMin = parseFloat(document.getElementById('costoOtrosGastosMin').value);
     const costoOtrosGastosMax = parseFloat(document.getElementById('costoOtrosGastosMax').value);
     
-    // Validar rangos de otros gastos únicamente
-    if (costoOtrosGastosMin >= costoOtrosGastosMax) {
-        alert("⚠️ Error: El costo de otros gastos mínimo debe ser menor que el máximo");
+    // Validar que los valores no sean negativos
+    if (costoOtrosGastosMin < 0) {
+        alert("⚠️ Error: El valor mínimo no puede ser menor a 0");
+        return;
+    }
+    
+    if (costoOtrosGastosMax < 0) {
+        alert("⚠️ Error: El valor máximo no puede ser menor a 0");
+        return;
+    }
+    
+    // Validar que el mínimo no sea mayor al máximo
+    if (costoOtrosGastosMin > costoOtrosGastosMax) {
+        alert("⚠️ Error: El valor mínimo no puede ser mayor al valor máximo");
+        return;
+    }
+    
+    // Validar que el mínimo no sea igual al máximo
+    if (costoOtrosGastosMin === costoOtrosGastosMax) {
+        alert("⚠️ Error: El valor mínimo no puede ser igual al valor máximo");
         return;
     }
     
@@ -553,51 +622,19 @@ function aplicarConfiguracionRangosOtrosGastos() {
     localStorage.setItem('rangosEspecificos', JSON.stringify(configuracionGlobal.rangos));
     
     actualizarRangosActualesMostrados();
-    
-    alert(`✅ Configuración de rangos para otros gastos aplicada exitosamente:\n\n` +
-          `Otros Gastos: $${costoOtrosGastosMin.toFixed(2)} - $${costoOtrosGastosMax.toFixed(2)}\n\n` +
-          `Los cambios se aplicarán inmediatamente en la sección de otros gastos.`);
 }
 
 function aplicarConfiguracionValidacion() {
     alert('✅ Configuración de validación aplicada');
 }
 
-function exportarConfiguracion() {
-    alert('📤 Configuración exportada');
-}
 
-function resetearConfiguracion() {
-    alert('🔄 Configuración restaurada');
-}
 
 function limpiarDatosSistema() {
     alert('Datos del sistema eliminados');
 }
 
-function actualizarEstadisticasSistemaConfig() {
-    const totalOtrosGastos = otrosGastosCreados.length;
-    const costoPromedioUnidad = otrosGastosCreados.length > 0 ? 
-        otrosGastosCreados.reduce((sum, item) => sum + item.otroGasto.getCostoPorUnidad(), 0) / totalOtrosGastos : 0;
-    const costoTotalProyecto = otrosGastosCreados.reduce((sum, item) => sum + item.otroGasto.getCostoPorUnidad(), 0);
-    
-    document.getElementById('estadisticasSistema').innerHTML = `
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value success">${totalOtrosGastos}</div>
-                <div class="stat-label">Total Otros Gastos</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value primary">$${costoPromedioUnidad.toFixed(2)}</div>
-                <div class="stat-label">Promedio Costo</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value purple">$${costoTotalProyecto.toFixed(2)}</div>
-                <div class="stat-label">Costo Total del Proyecto</div>
-            </div>
-        </div>
-    `;
-}
+
 
 // ===== INICIALIZACIÓN DEL SISTEMA =====
 

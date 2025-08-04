@@ -12,7 +12,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div class="logo">
+                <div class="logo" onclick="toggleSidebar()" style="cursor: pointer;">
                     <img src="../storage/vectors/browser-svgrepo-com.svg" alt="Logo" class="logo-icon">
                     <span class="logo-text">Panel de Control</span>
                 </div>
@@ -69,12 +69,7 @@
                     <h1 class="page-title">Gestión de Materiales</h1>
                     <p class="page-subtitle">Administra el inventario y costos de materiales del proyecto</p>
                 </div>
-                <div class="header-right">
-                    <div class="user-info">
-                        <img src="../storage/vectors/portrait-user-svgrepo-com.svg" alt="Usuario" class="user-avatar">
-                        <span class="user-name">Administrador</span>
-                    </div>
-                </div>
+                
             </header>
 
             <!-- Page Content -->
@@ -334,26 +329,18 @@
             <div class="modal-body config-content">
                 <div class="config-panel">
                     <h2>
-                        <img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="config-icon">
-                        Configuración de Rangos para Materiales
+                        <img src="../storage/vectors/lock-hashtag-svgrepo-com.svg" alt="" class="config-icon">
+                        Configuración de Seguridad
                     </h2>
-                    <p>Define los rangos específicos para costos de materiales:</p>
                     
                     <div class="config-grid">
                         <div class="input-group">
-                            <label for="costoPorUnidadMin">
+                            <label for="maximoCosteMaterial">
                                 <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="input-icon">
-                                Costo por Unidad - Mínimo ($):
+                                Máximo Coste de Material ($):
                             </label>
-                            <input type="number" id="costoPorUnidadMin" value="1" step="0.01">
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="costoPorUnidadMax">
-                                <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="input-icon">
-                                Costo por Unidad - Máximo ($):
-                            </label>
-                            <input type="number" id="costoPorUnidadMax" value="1000" step="0.01">
+                            <input type="number" id="maximoCosteMaterial" value="1000" step="0.01" min="1">
+                            <small>Define el límite máximo permitido para el coste por unidad de materiales</small>
                         </div>
                     </div>
                     
@@ -361,104 +348,15 @@
                         <strong>
                             <img src="../storage/vectors/traffic-light-svgrepo-com.svg" alt="" class="info-icon">
                             Nota:
-                        </strong> Estos rangos se aplicarán específicamente a materiales:<br>
-                        <strong>📦 Costo por Unidad:</strong> Validación para precios de materiales<br>
-                        <strong>Inventario:</strong> Los materiales pueden tener inventario gestionable<br>
-                        <strong>⚡ Aplicación:</strong> Los cambios se aplicarán inmediatamente en la creación de materiales
+                        </strong> Este valor se aplicará como límite máximo en la validación de costes de materiales.<br>
+                        <strong><img src="../storage/vectors/check-double-svgrepo-com.svg" alt="" class="info-icon"> Validación:</strong> Los materiales no podrán tener un coste por unidad superior a este valor<br>
+                        <strong><img src="../storage/vectors/lightbulb-alt-svgrepo-com.svg" alt="" class="info-icon"> Aplicación:</strong> Los cambios se aplicarán inmediatamente en la creación de materiales
                     </div>
                     
-                    <div class="range-display-container">
-                        <div id="rangosActuales" class="range-display">
-                            <strong>Rangos configurados:</strong><br>
-                            Materiales: $1.00 - $1000.00
-                        </div>
-                    </div>
-                    
-                    <button onclick="aplicarConfiguracionRangosMateriales()" class="button button-success">
-                        <img src="../storage/vectors/save-svgrepo-com.svg" alt="" class="button-icon">
-                        Aplicar Configuración de Materiales
+                    <button onclick="aplicarConfiguracionMaximoCoste()" class="button button-success">
+                        <img src="../storage/vectors/floppy-disk-svgrepo-com.svg" alt="" class="button-icon">
+                        Aplicar Configuración
                     </button>
-                </div>
-
-                <div class="config-panel">
-                    <h2>
-                        <img src="../storage/vectors/shield-svgrepo-com.svg" alt="" class="config-icon">
-                        Configuración de Validación
-                    </h2>
-                    
-                    <div class="config-grid">
-                        <div class="input-group">
-                            <label for="validacionEstricta">
-                                <img src="../storage/vectors/lock-svgrepo-com.svg" alt="" class="input-icon">
-                                Validación Estricta de Nombres:
-                            </label>
-                            <select id="validacionEstricta">
-                                <option value="true">Activada (Recomendado)</option>
-                                <option value="false">Desactivada</option>
-                            </select>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="mostrarConsejos">
-                                <img src="../storage/vectors/lightbulb-svgrepo-com.svg" alt="" class="input-icon">
-                                Mostrar Consejos de Ayuda:
-                            </label>
-                            <select id="mostrarConsejos">
-                                <option value="true">Sí (Recomendado)</option>
-                                <option value="false">No</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="caracteresProhibidosPersonalizado">
-                            <img src="../storage/vectors/traffic-light-svgrepo-com.svg" alt="" class="input-icon">
-                            Caracteres Prohibidos Personalizados:
-                        </label>
-                        <input type="text" id="caracteresProhibidosPersonalizado" 
-                               value="!&quot;·$%&amp;/()=?¿'¡+`*]^[´.:,;-_{}&lt;&gt;`~\|" 
-                               placeholder="Caracteres no permitidos en nombres">
-                        <small>Modifica los caracteres que no se permiten en los nombres</small>
-                    </div>
-                    
-                    <button onclick="aplicarConfiguracionValidacion()" class="button button-info">
-                        <img src="../storage/vectors/save-svgrepo-com.svg" alt="" class="button-icon">
-                        Aplicar Configuración de Validación
-                    </button>
-                </div>
-
-                <div class="config-panel">
-                    <h2>
-                        <img src="../storage/vectors/database-svgrepo-com.svg" alt="" class="config-icon">
-                        Configuración de Datos
-                    </h2>
-                    
-                    <div class="buttons-section">
-                        <button onclick="exportarConfiguracion()" class="button button-success">
-                            <img src="../storage/vectors/download-svgrepo-com.svg" alt="" class="button-icon">
-                            Exportar Configuración
-                        </button>
-                        
-                        <button onclick="resetearConfiguracion()" class="button button-warning">
-                            <img src="../storage/vectors/refresh-svgrepo-com.svg" alt="" class="button-icon">
-                            Restaurar Por Defecto
-                        </button>
-                        
-                        <button onclick="limpiarDatosSistema()" class="button button-danger">
-                            <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="button-icon">
-                            Limpiar Todos los Datos
-                        </button>
-                    </div>
-                </div>
-
-                <div class="config-panel">
-                    <h2>
-                        <img src="../storage/vectors/stats-svgrepo-com.svg" alt="" class="config-icon">
-                        Estadísticas del Sistema
-                    </h2>
-                    <div id="estadisticasSistema" class="stats-panel">
-                        <!-- Estadísticas se llenarán aquí -->
-                    </div>
                 </div>
             </div>
         </div>
@@ -468,5 +366,13 @@
     <script src="../js/Material.js"></script>
     <script src="../js/OtrosCostos.js"></script>
     <script src="../js/materiales.js"></script>
+    
+    <script>
+        // Función para alternar el estado del sidebar
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+    </script>
 </body>
 </html>

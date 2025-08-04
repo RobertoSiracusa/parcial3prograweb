@@ -12,7 +12,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div class="logo">
+                <div class="logo" onclick="toggleSidebar()" style="cursor: pointer;">
                     <img src="../storage/vectors/browser-svgrepo-com.svg" alt="Logo" class="logo-icon">
                     <span class="logo-text">Panel de Control</span>
                 </div>
@@ -69,12 +69,7 @@
                     <h1 class="page-title">Gestión de Empleados</h1>
                     <p class="page-subtitle">Administra y gestiona el personal del proyecto</p>
                 </div>
-                <div class="header-right">
-                    <div class="user-info">
-                        <img src="../storage/vectors/portrait-user-svgrepo-com.svg" alt="Usuario" class="user-avatar">
-                        <span class="user-name">Administrador</span>
-                    </div>
-                </div>
+                
             </header>
 
             <!-- Page Content -->
@@ -263,198 +258,23 @@
                             <img src="../storage/vectors/alarm-exclamation-svgrepo-com.svg" alt="" class="alarm-exclamation-icon">
                             Hora Extra:
                         </strong> Validación para horas extra (generalmente mayor)<br>
-                        <strong>⚡ Aplicación:</strong> Los cambios se aplicarán inmediatamente en la creación de empleados
+                        <strong><img src="../storage/vectors/lightbulb-alt-svgrepo-com.svg" alt="" class="info-icon"> Aplicación:</strong> Los cambios se aplicarán inmediatamente en la creación de empleados
                     </div>
                     
-                    <div class="range-display-container">
-                        <div id="rangosActuales" class="range-display">
-                            <strong>Rangos configurados:</strong><br>
-                            Costo/Hora: $1.00 - $100.00<br>
-                            Hora Extra: $1.00 - $150.00
-                        </div>
-                    </div>
+                    
                     
                     <button onclick="aplicarConfiguracionRangosEmpleados()" class="button button-success">
-                        <img src="../storage/vectors/check-svgrepo-com.svg" alt="" class="button-icon">
+                        <img src="../storage/vectors/floppy-disk-svgrepo-com.svg" alt="" class="button-icon">
                         Aplicar Configuración de Empleados
                     </button>
                 </div>
 
-                <div class="config-panel">
-                    <h2>
-                        <img src="../storage/vectors/shield-svgrepo-com.svg" alt="" class="shield-icon">
-                        Configuración de Validación
-                    </h2>
-                    
-                    <div class="config-grid">
-                        <div class="input-group">
-                            <label for="validacionEstricta">
-                                <img src="../storage/vectors/lock-svgrepo-com.svg" alt="" class="lock-icon">
-                                Validación Estricta de Nombres
-                            </label>
-                            <select id="validacionEstricta">
-                                <option value="true">Activada (Recomendado)</option>
-                                <option value="false">Desactivada</option>
-                            </select>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="mostrarConsejos">
-                                <img src="../storage/vectors/lightbulb-svgrepo-com.svg" alt="" class="lightbulb-icon">
-                                Mostrar Consejos de Ayuda
-                            </label>
-                            <select id="mostrarConsejos">
-                                <option value="true">Sí (Recomendado)</option>
-                                <option value="false">No</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="caracteresProhibidosPersonalizado">
-                            <img src="../storage/vectors/alarm-exclamation-svgrepo-com.svg" alt="" class="alarm-exclamation-icon">
-                            Caracteres Prohibidos Personalizados
-                        </label>
-                        <input type="text" id="caracteresProhibidosPersonalizado" 
-                               value="!&quot;·$%&amp;/()=?¿'¡+`*]^[´.:,;-_{}&lt;&gt;`~\|" 
-                               placeholder="Caracteres no permitidos en nombres">
-                        <small>Modifica los caracteres que no se permiten en los nombres</small>
-                    </div>
-                    
-                    <button onclick="aplicarConfiguracionValidacion()" class="button button-info">
-                        <img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="button-icon">
-                        Aplicar Configuración de Validación
-                    </button>
-                </div>
 
-                <div class="config-panel">
-                    <h2>
-                        <img src="../storage/vectors/stats-svgrepo-com.svg" alt="" class="stats-icon-large">
-                        Configuración de Interfaz
-                    </h2>
-                    
-                    <div class="config-grid">
-                        <div class="input-group">
-                            <label for="temaInterfaz">
-                                <img src="../storage/vectors/palette-svgrepo-com.svg" alt="" class="palette-icon">
-                                Tema de la Interfaz
-                            </label>
-                            <select id="temaInterfaz">
-                                <option value="default">Por Defecto</option>
-                                <option value="dark">Oscuro</option>
-                                <option value="light">Claro</option>
-                            </select>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="animaciones">
-                                <img src="../storage/vectors/sparkles-svgrepo-com.svg" alt="" class="sparkles-icon">
-                                Animaciones
-                            </label>
-                            <select id="animaciones">
-                                <option value="true">Activadas</option>
-                                <option value="false">Desactivadas</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="idioma">
-                            <img src="../storage/vectors/globe-svgrepo-com.svg" alt="" class="globe-icon">
-                            Idioma del Sistema
-                        </label>
-                        <select id="idioma">
-                            <option value="es">Español</option>
-                            <option value="en">Inglés</option>
-                            <option value="fr">Francés</option>
-                        </select>
-                    </div>
-                    
-                    <button onclick="aplicarConfiguracionInterfaz()" class="button button-purple">
-                        <img src="../storage/vectors/palette-svgrepo-com.svg" alt="" class="button-icon">
-                        Aplicar Configuración de Interfaz
-                    </button>
-                </div>
 
-                <div class="config-panel">
-                    <h2>
-                        <img src="../storage/vectors/database-svgrepo-com.svg" alt="" class="database-icon">
-                        Gestión de Datos
-                    </h2>
-                    
-                    <div class="config-grid">
-                        <div class="input-group">
-                            <label for="autoguardado">
-                                <img src="../storage/vectors/save-svgrepo-com.svg" alt="" class="save-icon">
-                                Autoguardado
-                            </label>
-                            <select id="autoguardado">
-                                <option value="true">Activado</option>
-                                <option value="false">Desactivado</option>
-                            </select>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="backupAutomatico">
-                                <img src="../storage/vectors/refresh-svgrepo-com.svg" alt="" class="refresh-icon">
-                                Backup Automático
-                            </label>
-                            <select id="backupAutomatico">
-                                <option value="true">Activado</option>
-                                <option value="false">Desactivado</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="buttons-section">
-                        <button onclick="exportarConfiguracion()" class="button button-success">
-                            <img src="../storage/vectors/download-svgrepo-com.svg" alt="" class="button-icon">
-                            Exportar Configuración
-                        </button>
-                        
-                        <button onclick="importarConfiguracion()" class="button button-info">
-                            <img src="../storage/vectors/upload-svgrepo-com.svg" alt="" class="button-icon">
-                            Importar Configuración
-                        </button>
-                        
-                        <button onclick="resetearConfiguracion()" class="button button-warning">
-                            <img src="../storage/vectors/refresh-svgrepo-com.svg" alt="" class="button-icon">
-                            Restaurar Por Defecto
-                        </button>
-                        
-                        <button onclick="limpiarDatosSistema()" class="button button-danger">
-                            <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="button-icon">
-                            Limpiar Todos los Datos
-                        </button>
-                    </div>
-                </div>
 
-                <div class="config-panel">
-                    <h2>
-                        <img src="../storage/vectors/stats-svgrepo-com.svg" alt="" class="stats-icon">
-                        Estadísticas del Sistema
-                    </h2>
-                    <div id="estadisticasSistema" class="stats-panel">
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-value primary" id="totalEmpleadosConfig">0</div>
-                                <div class="stat-label">Empleados Registrados</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value purple" id="totalMaterialesConfig">0</div>
-                                <div class="stat-label">Materiales en Inventario</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value success" id="totalTareasConfig">0</div>
-                                <div class="stat-label">Tareas Activas</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value warning" id="totalGastosConfig">$0</div>
-                                <div class="stat-label">Total de Gastos</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+
+
             </div>
         </div>
     </div>
@@ -521,5 +341,13 @@
     <script src="../js/Material.js"></script>
     <script src="../js/OtrosCostos.js"></script>
     <script src="../js/empleados.js"></script>
+    
+    <script>
+        // Función para alternar el estado del sidebar
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+    </script>
 </body>
 </html>

@@ -841,10 +841,7 @@ let configuracionGlobal = {
     tareas: {
         duracionMinima: 0.5,
         duracionMaxima: 40
-    },
-    validacion: { estricta: true, mostrarConsejos: true, caracteresProhibidos: `!"·$%&/()=?¿'¡+\`*]^[´.:,;-_{}<>\`~\\|` },
-    interfaz: { tema: 'default', animaciones: true, idioma: 'es' },
-    datos: { autoguardado: true, backupAutomatico: true }
+    }
 };
 
 function obtenerRangosTareas() {
@@ -858,7 +855,6 @@ function abrirModalConfiguracion() {
     cargarConfiguracionGlobal();
     document.getElementById('modalConfiguracion').style.display = 'block';
     actualizarInterfazConfiguracion();
-    actualizarEstadisticasSistemaConfig();
 }
 
 function cerrarModalConfiguracion() {
@@ -886,6 +882,7 @@ function actualizarInterfazConfiguracion() {
     document.getElementById('duracionMaximaTarea').value = configuracionGlobal.tareas?.duracionMaxima || 40;
     
     actualizarRangosActualesMostrados();
+    validarRangoConfiguracionTareas();
 }
 
 function actualizarRangosActualesMostrados() {
@@ -902,7 +899,13 @@ function aplicarConfiguracionTareas() {
     const duracionMin = parseFloat(document.getElementById('duracionMinimaTarea').value);
     const duracionMax = parseFloat(document.getElementById('duracionMaximaTarea').value);
     
-    // Validar rangos de tareas únicamente
+    // Validar que no sean valores negativos
+    if (duracionMin < 0 || duracionMax < 0) {
+        console.warn("⚠️ Error: Los valores no pueden ser negativos");
+        return;
+    }
+    
+    // Validar que el mínimo no sea mayor que el máximo
     if (duracionMin >= duracionMax) {
         console.warn("⚠️ Error: La duración mínima debe ser menor que la máxima");
         return;
@@ -925,12 +928,25 @@ function aplicarConfiguracionTareas() {
           `Los cambios se aplicarán inmediatamente en la sección de tareas.`);
 }
 
-function aplicarConfiguracionValidacion() {
-    console.log('✅ Configuración de validación aplicada');
-}
-
-function aplicarConfiguracionInterfaz() {
-    console.log('✅ Configuración de interfaz aplicada');
+function validarRangoConfiguracionTareas() {
+    const duracionMin = parseFloat(document.getElementById('duracionMinimaTarea').value);
+    const duracionMax = parseFloat(document.getElementById('duracionMaximaTarea').value);
+    const btnAplicar = document.getElementById('btnAplicarConfiguracionTareas');
+    
+    // Validar que no sean valores negativos
+    if (duracionMin < 0 || duracionMax < 0) {
+        btnAplicar.disabled = true;
+        return;
+    }
+    
+    // Validar que el mínimo no sea mayor que el máximo
+    if (duracionMin >= duracionMax) {
+        btnAplicar.disabled = true;
+        return;
+    }
+    
+    // Si todo está bien, habilitar el botón
+    btnAplicar.disabled = false;
 }
 
 function exportarConfiguracion() {
@@ -1098,53 +1114,7 @@ function removerOtroGastoTag(index) {
     }
 }
 
-function actualizarEstadisticasSistemaConfig() {
-    const estadisticasDiv = document.getElementById('estadisticasSistema');
-    
-    // Calcular estadísticas del sistema
-    const totalTareas = tareasCreadas.length;
-    const tareasPendientes = tareasCreadas.filter(item => item.tarea.getEstado() === 'pendiente').length;
-    const tareasEnProgreso = tareasCreadas.filter(item => item.tarea.getEstado() === 'en_progreso').length;
-    const tareasCompletadas = tareasCreadas.filter(item => item.tarea.getEstado() === 'completada').length;
-    const duracionPromedio = totalTareas > 0 ? tareasCreadas.reduce((sum, item) => sum + item.tarea.getDuracion(), 0) / totalTareas : 0;
-    const costoTotal = tareasCreadas.reduce((sum, item) => sum + item.tarea.calcularCostoTotal(), 0);
-    const costoReal = tareasCreadas
-        .filter(item => item.tarea.getEstado() === 'completada')
-        .reduce((sum, item) => sum + item.tarea.calcularCostoTotal(), 0);
-    
-    estadisticasDiv.innerHTML = `
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value success">${totalTareas}</div>
-                <div class="stat-label">Total Tareas</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value warning">${tareasPendientes}</div>
-                <div class="stat-label">Pendientes</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value primary">${tareasEnProgreso}</div>
-                <div class="stat-label">En Progreso</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value purple">${tareasCompletadas}</div>
-                <div class="stat-label">Completadas</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value info">${duracionPromedio.toFixed(1)}h</div>
-                <div class="stat-label">Duración Promedio</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value success">$${costoTotal.toFixed(2)}</div>
-                <div class="stat-label">Costo Total</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value danger">$${costoReal.toFixed(2)}</div>
-                <div class="stat-label">Costo Real</div>
-            </div>
-        </div>
-    `;
-}
+
 
 // ===== INICIALIZACIÓN DEL SISTEMA =====
 

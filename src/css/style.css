@@ -28,11 +28,56 @@ body {
     top: 0;
     z-index: 1000;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+    width: 80px;
+}
+
+.sidebar.collapsed .logo-text,
+.sidebar.collapsed .nav-text {
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    width: 0;
+    overflow: hidden;
+}
+
+.sidebar.collapsed .logo {
+    justify-content: center;
+    padding: 0;
+}
+
+.sidebar.collapsed .nav-link {
+    justify-content: center;
+    padding: 15px 10px;
+    margin-right: 0;
+}
+
+.sidebar.collapsed .sidebar-footer .nav-link {
+    justify-content: center;
+    padding: 15px 10px;
+    margin-right: 0;
+}
+
+.sidebar.collapsed .nav-icon {
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.sidebar.collapsed .logo-icon {
+    margin: 0;
+    flex-shrink: 0;
 }
 
 .sidebar-header {
     padding: 24px 20px;
     border-bottom: 1px solid #334155;
+}
+
+.sidebar.collapsed .sidebar-header {
+    padding: 24px 10px;
 }
 
 .logo {
@@ -55,6 +100,10 @@ body {
 
 .sidebar-nav {
     flex: 1;
+    padding: 20px 0;
+}
+
+.sidebar.collapsed .sidebar-nav {
     padding: 20px 0;
 }
 
@@ -112,6 +161,10 @@ body {
     border-top: 1px solid #334155;
 }
 
+.sidebar.collapsed .sidebar-footer {
+    padding: 20px 10px;
+}
+
 .settings-link {
     background: none;
     border: none;
@@ -160,30 +213,7 @@ body {
     margin: 0;
 }
 
-.header-right {
-    display: flex;
-    align-items: center;
-}
 
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 16px;
-    background: #f1f5f9;
-    border-radius: 8px;
-}
-
-.user-avatar {
-    width: 32px;
-    height: 32px;
-    filter: invert(0.5);
-}
-
-.user-name {
-    font-weight: 500;
-    color: #475569;
-}
 
 /* Dashboard Content */
 .dashboard-content {
@@ -688,14 +718,7 @@ body {
     background: #138496;
 }
 
-.button-purple {
-    background: #6f42c1;
-    color: white;
-}
 
-.button-purple:hover {
-    background: #5a32a3;
-}
 
 .button-danger {
     background: #dc3545;
@@ -704,6 +727,19 @@ body {
 
 .button-danger:hover {
     background: #c82333;
+}
+
+.button:disabled {
+    background-color: #9ca3af !important;
+    color: #6b7280 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    opacity: 0.6;
+}
+
+.button:disabled:hover {
+    background-color: #9ca3af !important;
+    transform: none !important;
 }
 
 .small-button {
@@ -949,14 +985,7 @@ body {
     background: #2563eb;
 }
 
-.button-purple {
-    background: #8b5cf6;
-    color: white;
-}
 
-.button-purple:hover {
-    background: #7c3aed;
-}
 
 .button-danger {
     background: #ef4444;
@@ -1700,8 +1729,8 @@ body {
 }
 
 .config-content {
-    max-height: 70vh;
-    overflow-y: auto;
+    max-height: auto;
+    overflow-y: visible;
 }
 
 .range-display-container {
@@ -1922,30 +1951,7 @@ body {
     margin-bottom: 24px;
 }
 
-/* Iconos adicionales para la página de empleados */
-.palette-icon {
-    width: 16px;
-    height: 16px;
-    filter: invert(0.5);
-    vertical-align: middle;
-    margin-right: 4px;
-}
 
-.sparkles-icon {
-    width: 16px;
-    height: 16px;
-    filter: invert(0.5);
-    vertical-align: middle;
-    margin-right: 4px;
-}
-
-.globe-icon {
-    width: 16px;
-    height: 16px;
-    filter: invert(0.5);
-    vertical-align: middle;
-    margin-right: 4px;
-}
 
 .save-icon {
     width: 16px;
