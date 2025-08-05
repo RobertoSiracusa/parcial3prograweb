@@ -92,16 +92,6 @@ class Tarea {
         this.personal = Array.isArray(personal) ? personal : (personal ? [personal] : []);
     }
 
-    agregarPersonal(personal) {
-        if (personal && !this.personal.find(p => p.getNombre() === personal.getNombre())) {
-            this.personal.push(personal);
-        }
-    }
-
-    removerPersonal(nombrePersonal) {
-        this.personal = this.personal.filter(p => p.getNombre() !== nombrePersonal);
-    }
-
     setMaterial(material) {
         this.materiales = Array.isArray(material) ? material : (material ? [material] : []); // Para compatibilidad
     }
@@ -110,15 +100,6 @@ class Tarea {
         this.materiales = Array.isArray(materiales) ? materiales : (materiales ? [materiales] : []);
     }
 
-    agregarMaterial(material) {
-        if (material && !this.materiales.find(m => m.getNombreMaterial() === material.getNombreMaterial())) {
-            this.materiales.push(material);
-        }
-    }
-
-    removerMaterial(nombreMaterial) {
-        this.materiales = this.materiales.filter(m => m.getNombreMaterial() !== nombreMaterial);
-    }
 
     setOtrosGastos(otrosGastos) {
         this.otrosGastos = Array.isArray(otrosGastos) ? otrosGastos : (otrosGastos ? [otrosGastos] : []); // Para compatibilidad
@@ -128,15 +109,6 @@ class Tarea {
         this.otrosGastos = Array.isArray(otrosGastos) ? otrosGastos : (otrosGastos ? [otrosGastos] : []);
     }
 
-    agregarOtroGasto(otroGasto) {
-        if (otroGasto && !this.otrosGastos.find(g => g.getNombre() === otroGasto.getNombre())) {
-            this.otrosGastos.push(otroGasto);
-        }
-    }
-
-    removerOtroGasto(nombreGasto) {
-        this.otrosGastos = this.otrosGastos.filter(g => g.getNombre() !== nombreGasto);
-    }
 
     setDuracion(duracion) {
         this.duracion = this._validarDuracion(duracion);

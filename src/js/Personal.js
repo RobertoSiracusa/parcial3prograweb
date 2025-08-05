@@ -315,63 +315,8 @@ class Personal {
         Salario total: $${this.calcularSalarioTotal().toFixed(2)}`;
     }
 
-    /**
-     * Valida que el costo por hora esté dentro de un rango
-     * Solicita al usuario ingresar un nuevo costo hasta que esté en el rango
-     * @param {number} minimo - Valor mínimo permitido
-     * @param {number} maximo - Valor máximo permitido
-     */
-    validarCosto(minimo, maximo) {
-        const min = parseFloat(minimo);
-        const max = parseFloat(maximo);
-        let nuevoCosto;
-        let esValido = false;
-        
-        while (!esValido) {
-            nuevoCosto = parseFloat(prompt(`Ingrese el costo por hora (rango: $${min} - $${max}):`));
-            
-            if (isNaN(nuevoCosto)) {
-                alert("Por favor ingrese un número válido");
-                continue;
-            }
-            
-            if (nuevoCosto >= min && nuevoCosto <= max) {
-                esValido = true;
-                this.costoPorHora = nuevoCosto;
-            } else {
-                alert("El costo esta fuera del rango del proyecto");
-            }
-        }
-    }
-
-    /**
-     * Valida que el costo por hora extra esté dentro de un rango
-     * Solicita al usuario ingresar un nuevo costo hasta que esté en el rango
-     * @param {number} minimo - Valor mínimo permitido
-     * @param {number} maximo - Valor máximo permitido
-     */
-    validarCostoExtra(minimo, maximo) {
-        const min = parseFloat(minimo);
-        const max = parseFloat(maximo);
-        let nuevoCosto;
-        let esValido = false;
-        
-        while (!esValido) {
-            nuevoCosto = parseFloat(prompt(`Ingrese el costo por hora extra (rango: $${min} - $${max}):`));
-            
-            if (isNaN(nuevoCosto)) {
-                alert("Por favor ingrese un número válido");
-                continue;
-            }
-            
-            if (nuevoCosto >= min && nuevoCosto <= max) {
-                esValido = true;
-                this.costoPorHoraExtra = nuevoCosto;
-            } else {
-                alert("El costo esta fuera del rango del proyecto");
-            }
-        }
-    }
+    
+   
 
     /**
      * Devuelve un objeto con toda la información del empleado
