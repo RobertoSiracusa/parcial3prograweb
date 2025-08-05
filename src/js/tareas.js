@@ -363,7 +363,7 @@ function asignarHorasAlEmpleado(tarea) {
     const empleadosCreados = cargarEmpleadosParaTareas();
     
     // Dividir la duración entre todos los empleados
-    const duracionPorEmpleado = duracionTarea / empleadosAsignados.length;
+    const duracionPorEmpleado = Math.round((duracionTarea / empleadosAsignados.length) * 100) / 100;
     
     empleadosAsignados.forEach(empleadoAsignado => {
         // Buscar el empleado específico por nombre (asumiendo que los nombres son únicos)

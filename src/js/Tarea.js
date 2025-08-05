@@ -129,7 +129,7 @@ class Tarea {
         // Costo del personal (si está asignado)
         if (this.personal && this.personal.length > 0) {
             // Dividir la duración entre todos los empleados
-            const duracionPorEmpleado = this.duracion / this.personal.length;
+            const duracionPorEmpleado = Math.round((this.duracion / this.personal.length) * 100) / 100;
             this.personal.forEach(empleado => {
                 const costoPersonal = empleado.calcularCostoPorHoras(duracionPorEmpleado);
                 costoTotal += costoPersonal;
@@ -174,7 +174,7 @@ class Tarea {
         }
 
         // Si hay múltiples empleados, dividir la duración
-        const duracionPorEmpleado = this.duracion / this.personal.length;
+        const duracionPorEmpleado = Math.round((this.duracion / this.personal.length) * 100) / 100;
         return this.personal[0].obtenerDesgloseCostoPorHoras(duracionPorEmpleado);
     }
 
