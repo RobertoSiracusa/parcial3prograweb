@@ -1006,14 +1006,7 @@ body {
     cursor: pointer;
 }
 
-/* Stats Panel */
-.stats-panel {
-    margin: 20px 0;
-    background: #f8fafc;
-    padding: 20px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-}
+
 
 .stats-title {
     color: #1e293b;
