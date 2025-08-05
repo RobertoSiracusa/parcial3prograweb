@@ -624,18 +624,6 @@ function aplicarConfiguracionRangosOtrosGastos() {
     actualizarRangosActualesMostrados();
 }
 
-function aplicarConfiguracionValidacion() {
-    alert('✅ Configuración de validación aplicada');
-}
-
-
-
-function limpiarDatosSistema() {
-    alert('Datos del sistema eliminados');
-}
-
-
-
 // ===== INICIALIZACIÓN DEL SISTEMA =====
 
 // Inicialización al cargar la página

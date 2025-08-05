@@ -106,14 +106,6 @@ class Material {
         return false;
     }
 
-    /**
-     * Verifica si hay stock disponible
-     * @param {number} cantidad - Cantidad a verificar
-     * @returns {boolean} True si hay suficiente stock
-     */
-    hayStock(cantidad) {
-        return this.inventario >= parseFloat(cantidad);
-    }
 
     /**
      * Devuelve una representación en string del objeto

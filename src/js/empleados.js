@@ -620,14 +620,6 @@ function aplicarConfiguracionRangosEmpleados() {
     }, 1000);
 }
 
-function aplicarConfiguracionValidacion() {
-    alert('✅ Configuración de validación aplicada');
-}
-
-
-
-
-
 // ===== INICIALIZACIÓN DEL SISTEMA =====
 
 // Inicialización al cargar la página

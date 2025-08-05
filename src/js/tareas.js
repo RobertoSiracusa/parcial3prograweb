@@ -431,28 +431,9 @@ function quitarHorasAlEmpleado(tarea) {
 
 // ===== FUNCIONES PARA DROPDOWN =====
 
-function toggleDropdown(index, event) {
-    // Prevenir que el evento se propague y cierre el dropdown inmediatamente
-    if (event) {
-        event.stopPropagation();
-    }
-    
-    // Cerrar todos los otros dropdowns
-    closeAllDropdowns();
-    
-    // Abrir/cerrar el dropdown específico
-    const dropdown = document.getElementById(`dropdown-${index}`);
-    if (dropdown) {
-        dropdown.classList.toggle('show');
-    }
-}
 
-function closeAllDropdowns() {
-    const dropdowns = document.querySelectorAll('.dropdown-menu');
-    dropdowns.forEach(dropdown => {
-        dropdown.classList.remove('show');
-    });
-}
+
+
 
 // Cerrar dropdowns al hacer clic fuera
 document.addEventListener('click', function(event) {
@@ -949,17 +930,6 @@ function validarRangoConfiguracionTareas() {
     btnAplicar.disabled = false;
 }
 
-function exportarConfiguracion() {
-    console.log('📤 Configuración exportada');
-}
-
-function resetearConfiguracion() {
-    console.log('🔄 Configuración restaurada');
-}
-
-function limpiarDatosSistema() {
-    console.log('Datos del sistema eliminados');
-}
 
 // ===== FUNCIONES PARA SELECCIÓN DE EMPLEADOS =====
 
