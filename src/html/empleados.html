@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Empleados - Panel de Control</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo" onclick="toggleSidebar()" style="cursor: pointer;">
+                    <img src="../storage/vectors/browser-svgrepo-com.svg" alt="Logo" class="logo-icon">
+                    <span class="logo-text">Panel de Control</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <img src="../storage/vectors/home-svgrepo-com.svg" alt="Inicio" class="nav-icon">
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="empleados.html" class="nav-link">
+                            <img src="../storage/vectors/user-svgrepo-com.svg" alt="Empleados" class="nav-icon">
+                            <span class="nav-text">Empleados</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="materiales.html" class="nav-link">
+                            <img src="../storage/vectors/layers-svgrepo-com.svg" alt="Materiales" class="nav-icon">
+                            <span class="nav-text">Materiales</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="otros-gastos.html" class="nav-link">
+                            <img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="Otros Gastos" class="nav-icon">
+                            <span class="nav-text">Otros Gastos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="tareas.html" class="nav-link">
+                            <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="Tareas" class="nav-icon">
+                            <span class="nav-text">Tareas</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button onclick="abrirModalConfiguracion()" class="nav-link settings-link">
+                    <img src="../storage/vectors/settings-svgrepo-com.svg" alt="Configuración" class="nav-icon">
+                    <span class="nav-text">Configuración</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-left">
+                    <h1 class="page-title">Gestión de Empleados</h1>
+                    <p class="page-subtitle">Administra y gestiona el personal del proyecto</p>
+                </div>
+                
+            </header>
+
+            <!-- Page Content -->
+            <div class="dashboard-content">
+                <!-- Action Buttons -->
+                <div class="action-buttons-section">
+                    <div class="buttons-section">
+                        <button onclick="crearEmpleadoPersonalizado()" class="button button-success">
+                            <img src="../storage/vectors/user2-svgrepo-com.svg" alt="" class="button-icon">
+                            Crear Empleado Nuevo
+                        </button>
+                        
+                        <button onclick="limpiarListaEmpleados()" class="button button-warning">
+                            <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="button-icon">
+                            Limpiar Lista
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="stats-section">
+                    <h2 class="section-title">Estadísticas de Empleados</h2>
+                    <div id="estadisticasEmpleados" class="stats-grid">
+                        <!-- Estadísticas se llenarán aquí -->
+                    </div>
+                </div>
+
+                <!-- Employees List -->
+                <div class="employees-section">
+                    <div class="section-header-employees">
+                        <h2 class="section-title">
+                            <img src="../storage/vectors/user-svgrepo-com.svg" alt="" class="user-icon-large">
+                            Lista de Empleados (<span id="contadorEmpleados">0</span>)
+                        </h2>
+                    </div>
+                    
+                    <div id="listaEmpleados" class="employees-list">
+                        <!-- Lista de empleados se llenará aquí -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para Crear Empleado -->
+    <div id="modalCrearEmpleado" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <img src="../storage/vectors/user2-svgrepo-com.svg" alt="" class="user2-icon-large">
+                    Crear Nuevo Empleado
+                </h2>
+                <button onclick="cerrarModalCrearEmpleado()" class="modal-close">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="config-panel">
+                    <h2>
+                        <img src="../storage/vectors/portrait-user-svgrepo-com.svg" alt="" class="portrait-user-icon-large">
+                        Información del Empleado
+                    </h2>
+                    <p>Complete todos los campos para crear el empleado:</p>
+                    
+                    <div class="config-grid">
+                        <div class="input-group">
+                            <label for="nombreEmpleado">
+                                <img src="../storage/vectors/user2-svgrepo-com.svg" alt="" class="user2-icon">
+                                Nombre del Empleado
+                            </label>
+                            <input type="text" id="nombreEmpleado" placeholder="Ej: Juan Pérez">
+                            <small id="errorNombre" class="error-message"></small>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="costoPorHora">
+                                <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon">
+                                Costo por Hora ($)
+                            </label>
+                            <input type="number" id="costoPorHora" step="0.01" min="0" placeholder="Ej: 25.50">
+                            <small id="errorCostoHora" class="error-message"></small>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="costoPorHoraExtra">
+                                <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon">
+                                Costo por Hora Extra ($)
+                            </label>
+                            <input type="number" id="costoPorHoraExtra" step="0.01" min="0" placeholder="Ej: 35.75">
+                            <small id="errorCostoHoraExtra" class="error-message"></small>
+                        </div>
+                    </div>
+                    
+                    <div class="info-note">
+                        <strong>
+                            <img src="../storage/vectors/traffic-light-svgrepo-com.svg" alt="" class="traffic-light-icon">
+                            Información:
+                        </strong><br>
+                        • <strong>Horas trabajadas:</strong> Comenzarán automáticamente en 0<br>
+                        • <strong>Validación:</strong> Los costos deben estar dentro del rango configurado<br>
+                        • <strong>Caracteres prohibidos:</strong> No se permiten caracteres especiales en el nombre<br>
+                        • <strong>Rango actual:</strong> <span id="rangoInfoEmpleado">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button onclick="validarYCrearEmpleado()" class="button button-success">
+                    <img src="../storage/vectors/circle-check-svgrepo-com.svg" alt="" class="button-icon">
+                    Crear Empleado
+                </button>
+                <button onclick="limpiarFormularioEmpleado()" class="button button-info">
+                    <img src="../storage/vectors/refresh-ccw-clock-svgrepo-com.svg" alt="" class="button-icon">
+                    Limpiar Campos
+                </button>
+                <button onclick="cerrarModalCrearEmpleado()" class="button button-danger">
+                    <img src="../storage/vectors/ban-svgrepo-com.svg" alt="" class="button-icon">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Configuración -->
+    <div id="modalConfiguracion" class="modal">
+        <div class="modal-content config-modal">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="settings-icon-large">
+                    Configuración del Sistema
+                </h2>
+                <button onclick="cerrarModalConfiguracion()" class="modal-close">×</button>
+            </div>
+            
+            <div class="modal-body config-content">
+                <div class="config-panel">
+                    <h2>
+                        <img src="../storage/vectors/user-svgrepo-com.svg" alt="" class="user-icon-large">
+                        Configuración de Rangos para Empleados
+                    </h2>
+                    <p>Define los rangos específicos para costos de empleados:</p>
+                    
+                    <div class="config-grid">
+                        <div class="input-group">
+                            <label for="costoPorHoraMin">
+                                <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon">
+                                Costo por Hora - Mínimo ($)
+                            </label>
+                            <input type="number" id="costoPorHoraMin" value="1" step="0.01">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="costoPorHoraMax">
+                                <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon">
+                                Costo por Hora - Máximo ($)
+                            </label>
+                            <input type="number" id="costoPorHoraMax" value="100" step="0.01">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="costoPorHoraExtraMin">
+                                <img src="../storage/vectors/alarm-exclamation-svgrepo-com.svg" alt="" class="alarm-exclamation-icon">
+                                Costo por Hora Extra - Mínimo ($)
+                            </label>
+                            <input type="number" id="costoPorHoraExtraMin" value="1" step="0.01">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="costoPorHoraExtraMax">
+                                <img src="../storage/vectors/alarm-exclamation-svgrepo-com.svg" alt="" class="alarm-exclamation-icon">
+                                Costo por Hora Extra - Máximo ($)
+                            </label>
+                            <input type="number" id="costoPorHoraExtraMax" value="150" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div class="info-note">
+                        <strong>
+                            <img src="../storage/vectors/traffic-light-svgrepo-com.svg" alt="" class="traffic-light-icon">
+                            Nota:
+                        </strong> Estos rangos se aplicarán específicamente a empleados:<br>
+                        <strong>
+                            <img src="../storage/vectors/cash-register-svgrepo-com.svg" alt="" class="cash-register-icon">
+                            Costo por Hora:
+                        </strong> Validación para salarios regulares<br>
+                        <strong>
+                            <img src="../storage/vectors/alarm-exclamation-svgrepo-com.svg" alt="" class="alarm-exclamation-icon">
+                            Hora Extra:
+                        </strong> Validación para horas extra (generalmente mayor)<br>
+                        <strong><img src="../storage/vectors/lightbulb-alt-svgrepo-com.svg" alt="" class="info-icon"> Aplicación:</strong> Los cambios se aplicarán inmediatamente en la creación de empleados
+                    </div>
+                    
+                    
+                    
+                    <button onclick="aplicarConfiguracionRangosEmpleados()" class="button button-success">
+                        <img src="../storage/vectors/floppy-disk-svgrepo-com.svg" alt="" class="button-icon">
+                        Aplicar Configuración de Empleados
+                    </button>
+                </div>
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Advertencia para Empleado en Tareas Activas -->
+    <div id="modalAdvertenciaEmpleadoEnTareas" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <img src="../storage/vectors/alarm-exclamation-svgrepo-com.svg" alt="" class="modal-title-icon">
+                    No se puede eliminar
+                </h2>
+                <button onclick="cerrarModalAdvertenciaEmpleadoEnTareas()" class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmacion-mensaje">
+                    <img src="../storage/vectors/alarm-exclamation-svgrepo-com.svg" alt="" class="confirmacion-icon">
+                    <p id="mensajeAdvertenciaEmpleadoEnTareas">Este empleado no se puede eliminar porque está asignado a tareas activas.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="buttons-section">
+                    <button onclick="cerrarModalAdvertenciaEmpleadoEnTareas()" class="button button-info">
+                        <img src="../storage/vectors/ban-svgrepo-com.svg" alt="" class="button-icon">
+                        Entendido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Confirmación para Eliminar Empleado -->
+    <div id="modalConfirmacionEliminar" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="modal-title-icon">
+                    Confirmar Eliminación
+                </h2>
+                <button onclick="cerrarModalConfirmacionEliminar()" class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmacion-mensaje">
+                    <img src="../storage/vectors/alarm-exclamation-svgrepo-com.svg" alt="" class="confirmacion-icon">
+                    <p id="mensajeConfirmacionEliminar">¿Está seguro de que desea eliminar este empleado?</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="buttons-section">
+                    <button onclick="confirmarEliminacionEmpleado()" class="button button-danger">
+                        <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="button-icon">
+                        Sí, Eliminar
+                    </button>
+                    <button onclick="cerrarModalConfirmacionEliminar()" class="button button-info">
+                        <img src="../storage/vectors/ban-svgrepo-com.svg" alt="" class="button-icon">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../js/Personal.js"></script>
+    <script src="../js/Material.js"></script>
+    <script src="../js/OtrosCostos.js"></script>
+    <script src="../js/empleados.js"></script>
+    
+    <script>
+        // Función para alternar el estado del sidebar
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+    </script>
+</body>
+</html>

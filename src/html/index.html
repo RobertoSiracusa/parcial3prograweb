@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Proyectos - Dashboard</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="../js/Personal.js"></script>
+    <script src="../js/Tarea.js"></script>
+    <script src="../js/Material.js"></script>
+    <script src="../js/OtrosGastos.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo" onclick="toggleSidebar()" style="cursor: pointer;">
+                    <img src="../storage/vectors/browser-svgrepo-com.svg" alt="Logo" class="logo-icon">
+                    <span class="logo-text">Panel de Control</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item active">
+                        <a href="#" class="nav-link">
+                            <img src="../storage/vectors/home-svgrepo-com.svg" alt="Inicio" class="nav-icon">
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="empleados.html" class="nav-link">
+                            <img src="../storage/vectors/user-svgrepo-com.svg" alt="Empleados" class="nav-icon">
+                            <span class="nav-text">Empleados</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="materiales.html" class="nav-link">
+                            <img src="../storage/vectors/layers-svgrepo-com.svg" alt="Materiales" class="nav-icon">
+                            <span class="nav-text">Materiales</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="otros-gastos.html" class="nav-link">
+                            <img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="Otros Gastos" class="nav-icon">
+                            <span class="nav-text">Otros Gastos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="tareas.html" class="nav-link">
+                            <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="Tareas" class="nav-icon">
+                            <span class="nav-text">Tareas</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <!-- Footer del sidebar -->
+            </div>
+        </aside>
+
+        <!-- Overlay para móviles -->
+        <div class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-left">
+                    <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Bienvenido al sistema de control de proyectos</p>
+                </div>
+                
+            </header>
+
+                                                   <!-- Dashboard Content -->
+              <div class="dashboard-content">
+                  <!-- Estadísticas Básicas -->
+                  <div class="stats-section">
+                      <h2 class="section-title">Estadísticas</h2>
+                      <div class="stats-grid">
+                          <div class="stat-card">
+                              <div class="stat-value primary" id="totalEmpleados">0</div>
+                              <div class="stat-label">Empleados</div>
+                          </div>
+                          <div class="stat-card">
+                              <div class="stat-value purple" id="totalMateriales">0</div>
+                              <div class="stat-label">Materiales</div>
+                          </div>
+                          <div class="stat-card">
+                              <div class="stat-value success" id="totalTareas">0</div>
+                              <div class="stat-label">Tareas</div>
+                          </div>
+                          <div class="stat-card">
+                              <div class="stat-value warning" id="totalGastos">$0</div>
+                              <div class="stat-label">Cantidad de Gastos</div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Acciones Rápidas -->
+                  <div class="quick-actions-section">
+                      <h2 class="section-title">Acciones Rápidas</h2>
+                      <div class="quick-actions-grid">
+                          <a href="empleados.html" class="quick-action-card">
+                              <div class="action-icon">
+                                  <img src="../storage/vectors/user-svgrepo-com.svg" alt="Empleados" class="action-icon-img">
+                              </div>
+                              <h3>Gestionar Empleados</h3>
+                              <p>Crear, editar y administrar empleados del proyecto</p>
+                          </a>
+                          
+                          <a href="materiales.html" class="quick-action-card">
+                              <div class="action-icon">
+                                  <img src="../storage/vectors/layers-svgrepo-com.svg" alt="Materiales" class="action-icon-img">
+                              </div>
+                              <h3>Gestionar Materiales</h3>
+                              <p>Administrar inventario y costos de materiales</p>
+                          </a>
+                          
+                          <a href="tareas.html" class="quick-action-card">
+                              <div class="action-icon">
+                                  <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="Tareas" class="action-icon-img">
+                              </div>
+                              <h3>Gestionar Tareas</h3>
+                              <p>Organizar y asignar tareas del proyecto</p>
+                          </a>
+                          
+                          <a href="otros-gastos.html" class="quick-action-card">
+                              <div class="action-icon">
+                                  <img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="Gastos" class="action-icon-img">
+                              </div>
+                              <h3>Otros Gastos</h3>
+                              <p>Registrar gastos adicionales del proyecto</p>
+                          </a>
+                      </div>
+                  </div>
+
+                  <!-- Project Dashboard -->
+                  <div class="stats-section">
+                      <h2 class="section-title">Dashboard del Proyecto</h2>
+                     <div class="dashboard-grid">
+                         <!-- Duración del trabajo -->
+                         <div class="card">
+                             <h3>Duración de Tareas</h3>
+                             <div class="duration-chart" id="durationChart"></div>
+                             <div class="total-duration">
+                                 <span id="totalDuration">0</span>
+                             </div>
+                         </div>
+
+                         <!-- Empleados -->
+                         <div class="card">
+                             <h3>Salario adquirido por empleado</h3>
+                             <div class="team-list" id="teamList"></div>
+                         </div>
+
+                         <!-- Materiales -->
+                         <div class="card">
+                             <h3>Listado de Materiales</h3>
+                             <div class="materials-list" id="materialsList"></div>
+                         </div>
+
+                         <!-- Costos extra -->
+                         <div class="card">
+                             <h3>Listado de Gastos Extra</h3>
+                             <div class="extra-costs-list" id="extraCostsList"></div>
+                         </div>
+
+                         <!-- Costos -->
+                         <div class="card">
+                             <h3>Contador de Costos</h3>
+                             <div class="cost-chart" id="costChart"></div>
+                             <div class="cost-difference">
+                                 <div class="difference-bar">
+                                     <span>Diferencia</span>
+                                     <span id="costDifference">$0</span>
+                                 </div>
+                             </div>
+                         </div>
+
+                         <!-- Distribución de Costos -->
+                         <div class="card">
+                             <h3>Distribución de Costos Totales del Proyecto</h3>
+                             <div class="pie-chart-container">
+                                 <canvas id="costPieChart" width="300" height="300"></canvas>
+                                 <div class="pie-chart-legend" id="pieChartLegend"></div>
+                             </div>
+                         </div>
+
+                         <!-- Dashboard 1 -->
+                         <div class="card">
+                             <h3>Estado de Tareas</h3>
+                             <div class="tasks-status-list" id="tasksStatusList">
+                                 <!-- Contenido se llenará dinámicamente -->
+                             </div>
+                             <div class="tasks-completion-total" id="tasksCompletionTotal">
+                                 <!-- Total de tareas completadas se llenará dinámicamente -->
+                             </div>
+                         </div>
+
+
+
+                         <!-- Dashboard 3 -->
+                         <div class="card">
+                             <h3>Distribución de Costos Reales</h3>
+                             <div class="pie-chart-container">
+                                 <canvas id="costPieChartClone" width="300" height="300"></canvas>
+                                 <div class="pie-chart-legend" id="pieChartLegendClone"></div>
+                             </div>
+                         </div>
+
+                         <!-- Dashboard 4 -->
+                         <div class="card">
+                             <h3>Distribución de Salario</h3>
+                             <div class="salary-distribution-container">
+                                 <div class="employee-selector">
+                                     <label for="employeeSelect">Seleccionar Empleado:</label>
+                                     <select id="employeeSelect" onchange="actualizarDistribucionSalario()">
+                                         <option value="">-- Selecciona un empleado --</option>
+                                     </select>
+                                 </div>
+                                 <div class="pie-chart-container">
+                                     <canvas id="salaryPieChart" width="300" height="300"></canvas>
+                                     <div class="pie-chart-legend" id="salaryPieChartLegend"></div>
+                                 </div>
+                             </div>
+                         </div>
+
+                         <!-- Dashboard 5 -->
+                         <div class="card">
+                             <h3>Utilización de Empleados</h3>
+                             <div class="employee-utilization-list" id="employeeUtilizationList">
+                                 <!-- Contenido se llenará dinámicamente -->
+                             </div>
+                         </div>
+                     </div>
+                     
+                     <!-- Botones de acción del dashboard -->
+                     <div class="dashboard-actions">
+                         <button onclick="actualizarDashboardManual()" id="btnActualizarDashboard">
+                             <img src="../storage/vectors/browser-svgrepo-com.svg" alt="Actualizar" class="button-icon">
+                             Actualizar Dashboard
+                         </button>
+                         <button onclick="eliminarDatosProyecto()" id="btnEliminarDatos" class="btn-danger">
+                             <img src="../storage/vectors/trash-svgrepo-com.svg" alt="Eliminar" class="button-icon">
+                             Eliminar Datos del Proyecto
+                         </button>
+                     </div>
+                     </div>
+                 </div>
+
+
+            </div>
+        </main>
+    </div>
+
+
+                    
+    <!-- Script principal del dashboard -->
+    <script src="../js/index.js"></script>
+
+    <!-- Modal de confirmación para eliminar datos del proyecto -->
+    <div id="modalEliminarDatosProyecto" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <img src="../storage/vectors/trash-svgrepo-com.svg" alt="Eliminar" class="modal-title-icon">
+                    Eliminar Datos del Proyecto
+                </h2>
+                <span class="modal-close" onclick="cerrarModalEliminarDatos()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="confirmacion-mensaje">
+                    <div class="confirmacion-icon">
+                        <img src="../storage/vectors/alarm-exclamation-svgrepo-com.svg" alt="Advertencia">
+                    </div>
+                    <div class="confirmacion-texto">
+                        <p><strong>¿Estás seguro de que quieres eliminar todos los datos del proyecto?</strong></p>
+                        <p>Esta acción eliminará permanentemente:</p>
+                        <ul>
+                            <li>Todos los empleados registrados</li>
+                            <li>Todos los materiales del inventario</li>
+                            <li>Todos los otros gastos</li>
+                            <li>Todas las tareas del proyecto</li>
+                        </ul>
+                        <p style="color: #e74c3c; font-weight: 600;">⚠️ Esta acción NO se puede deshacer.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="buttons-section">
+                    <button class="button button-info" onclick="cerrarModalEliminarDatos()">
+                        <img src="../storage/vectors/align-right-svgrepo-com.svg" alt="Cancelar" class="button-icon">
+                        Cancelar
+                    </button>
+                    <button class="button button-danger" onclick="confirmarEliminarDatos()">
+                        <img src="../storage/vectors/trash-svgrepo-com.svg" alt="Eliminar" class="button-icon">
+                        Eliminar Todo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación de eliminación exitosa -->
+    <div id="modalConfirmacionEliminacion" class="modal">
+        <div class="modal-content modal-pequeno">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    Datos Eliminados
+                </h2>
+                <span class="modal-close" onclick="cerrarModalConfirmacion()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="confirmacion-exitosa">
+                    <div class="confirmacion-texto-exitosa">
+                        <p><strong>¡Eliminación completada!</strong></p>
+                        <p>Todos los datos del proyecto han sido eliminados exitosamente.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="buttons-section">
+                    <button class="button button-success" onclick="cerrarModalConfirmacion()">
+                        Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Tareas - Panel de Control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo" onclick="toggleSidebar()" style="cursor: pointer;">
+                    <img src="../storage/vectors/browser-svgrepo-com.svg" alt="Logo" class="logo-icon">
+                    <span class="logo-text">Panel de Control</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">
+                            <img src="../storage/vectors/home-svgrepo-com.svg" alt="Inicio" class="nav-icon">
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="empleados.html" class="nav-link">
+                            <img src="../storage/vectors/user-svgrepo-com.svg" alt="Empleados" class="nav-icon">
+                            <span class="nav-text">Empleados</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="materiales.html" class="nav-link">
+                            <img src="../storage/vectors/layers-svgrepo-com.svg" alt="Materiales" class="nav-icon">
+                            <span class="nav-text">Materiales</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="otros-gastos.html" class="nav-link">
+                            <img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="Otros Gastos" class="nav-icon">
+                            <span class="nav-text">Otros Gastos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="tareas.html" class="nav-link">
+                            <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="Tareas" class="nav-icon">
+                            <span class="nav-text">Tareas</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button onclick="abrirModalConfiguracion()" class="nav-link settings-link">
+                    <img src="../storage/vectors/settings-svgrepo-com.svg" alt="Configuración" class="nav-icon">
+                    <span class="nav-text">Configuración</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-left">
+                    <h1 class="page-title">Gestión de Tareas</h1>
+                    <p class="page-subtitle">Administra y gestiona las tareas del proyecto</p>
+                </div>
+                
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Action Buttons -->
+                <div class="action-buttons-section">
+                    <div class="buttons-section">
+                        <button onclick="crearTareaPersonalizada()" class="button button-success">
+                            <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="button-icon">
+                            Crear Tarea Nueva
+                        </button>
+                        
+                        <button onclick="limpiarListaTareas()" class="button button-warning">
+                            <img src="../storage/vectors/refresh-ccw-clock-svgrepo-com.svg" alt="" class="button-icon">
+                            Limpiar Lista
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="stats-section">
+                    <h2 class="section-title">Estadísticas de Tareas</h2>
+                    <div id="estadisticasTareas" class="stats-grid">
+                        <!-- Estadísticas se llenarán aquí -->
+                    </div>
+                </div>
+
+                <!-- Tareas List -->
+                <div class="employees-section">
+                    <div class="section-header-employees">
+                        <h2 class="section-title">
+                            <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon-large">
+                            Lista Detallada de Tareas (<span id="contadorTareas">0</span>)
+                        </h2>
+                    </div>
+                    <div id="listaTareas" class="employees-list">
+                        <!-- Lista de tareas se llenará aquí -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para Crear Tarea -->
+    <div id="modalCrearTarea" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="modal-title-icon">
+                    Crear Nueva Tarea
+                </h2>
+                <button onclick="cerrarModalCrearTarea()" class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="config-panel">
+                    <h3><img src="../storage/vectors/portrait-user-svgrepo-com.svg" alt="" class="portrait-user-icon-large"> Información de la Tarea</h3>
+                    <p>Complete la información básica de la tarea:</p>
+                    <div class="config-grid">
+                        <div class="input-group">
+                            <label for="nombreTarea">
+                                <img src="../storage/vectors/user-list-svgrepo-com.svg" alt="" class="input-icon">
+                                Nombre de la Tarea:
+                            </label>
+                            <input type="text" id="nombreTarea" placeholder="Ej: Desarrollar página web">
+                            <small id="errorNombreTarea" class="error-message"></small>
+                        </div>
+                        <div class="input-group">
+                            <label for="duracionTarea">
+                                <img src="../storage/vectors/clock-svgrepo-com.svg" alt="" class="input-icon">
+                                Duración (horas):
+                            </label>
+                            <input type="number" id="duracionTarea" step="0.5" min="0" placeholder="Ej: 8.5">
+                            <small id="errorDuracionTarea" class="error-message"></small>
+                        </div>
+                    </div>
+
+                    <h3><img src="../storage/vectors/user-svgrepo-com.svg" alt="" class="user-icon-large">Asignación de Personal (Opcional)</h3>
+                    <div class="config-grid">
+                        <div class="input-group full-width">
+                            <label>
+                                <img src="../storage/vectors/user-svgrepo-com.svg" alt="" class="input-icon">
+                                Seleccionar Personal:
+                            </label>
+                            <div class="multiple-select-container">
+                                <div id="empleadosSeleccionados" class="empleados-seleccionados">
+                                    <!-- Los empleados seleccionados se mostrarán aquí -->
+                                </div>
+                                <div id="listaEmpleados" class="lista-empleados">
+                                    <!-- Los empleados disponibles se mostrarán aquí -->
+                                </div>
+                                <small class="help-text">Haz clic en cada empleado para seleccionarlo/deseleccionarlo</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3><img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="layers-icon-large">Material Necesario (Opcional)</h3>
+                    <div class="config-grid">
+                        <div class="input-group full-width">
+                            <label>
+                                <img src="../storage/vectors/layers-svgrepo-com.svg" alt="" class="input-icon">
+                                Seleccionar Material:
+                            </label>
+                            <div class="multiple-select-container">
+                                <div id="materialesSeleccionados" class="empleados-seleccionados">
+                                    <!-- Los materiales seleccionados se mostrarán aquí -->
+                                </div>
+                                <div id="listaMateriales" class="lista-empleados">
+                                    <!-- Los materiales disponibles se mostrarán aquí -->
+                                </div>
+                                <small class="help-text">Haz clic en cada material para seleccionarlo/deseleccionarlo</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3><img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="" class="briefcase-icon-large">Otros Gastos (Opcional)</h3>
+                    <div class="config-grid">
+                        <div class="input-group full-width">
+                            <label>
+                                <img src="../storage/vectors/briefcase-svgrepo-com.svg" alt="" class="input-icon">
+                                Seleccionar Otros Gastos:
+                            </label>
+                            <div class="multiple-select-container">
+                                <div id="otrosGastosSeleccionados" class="empleados-seleccionados">
+                                    <!-- Los otros gastos seleccionados se mostrarán aquí -->
+                                </div>
+                                <div id="listaOtrosGastos" class="lista-empleados">
+                                    <!-- Los otros gastos disponibles se mostrarán aquí -->
+                                </div>
+                                <small class="help-text">Haz clic en cada gasto para seleccionarlo/deseleccionarlo</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-note">
+                        <strong><img src="../storage/vectors/traffic-light-svgrepo-com.svg" alt="" class="traffic-light-icon"> Información:</strong><br>
+                        • <strong>Duración:</strong> Tiempo estimado para completar la tarea<br>
+                        • <strong>Asignaciones:</strong> Todas son opcionales, puedes crear tareas sin asignar recursos<br>
+                        • <strong>Costo:</strong> Se calculará automáticamente basado en las asignaciones<br>
+                        • <strong>Estado:</strong> Las tareas nuevas inician como "Pendiente"
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="buttons-section">
+                    <button onclick="validarYCrearTarea()" class="button button-success">
+                        <img src="../storage/vectors/circle-check-svgrepo-com.svg" alt="" class="button-icon">
+                        Crear Tarea
+                    </button>
+                    <button onclick="limpiarFormularioTarea()" class="button button-info">
+                        <img src="../storage/vectors/refresh-ccw-clock-svgrepo-com.svg" alt="" class="button-icon">
+                        Limpiar Campos
+                    </button>
+                    <button onclick="cerrarModalCrearTarea()" class="button button-danger">
+                        <img src="../storage/vectors/ban-svgrepo-com.svg" alt="" class="button-icon">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Configuración (compartido) -->
+    <div id="modalConfiguracion" class="modal">
+        <div class="modal-content config-modal">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <img src="../storage/vectors/settings-svgrepo-com.svg" alt="" class="modal-title-icon">
+                    Configuración Global del Sistema
+                </h2>
+                <button onclick="cerrarModalConfiguracion()" class="modal-close">×</button>
+            </div>
+            <div class="modal-body config-content">
+                <div class="config-panel">
+                    <h2><img src="../storage/vectors/clipboard-svgrepo-com.svg" alt="" class="clipboard-icon-large">Configuración de Tareas</h2>
+                    <p>Configuración específica para el módulo de tareas:</p>
+                    
+                    <div class="config-grid">
+                        <div class="input-group">
+                            <label for="duracionMinimaTarea">
+                                <img src="../storage/vectors/clock-svgrepo-com.svg" alt="" class="input-icon">
+                                Duración Mínima (horas):
+                            </label>
+                            <input type="number" id="duracionMinimaTarea" value="0.5" step="0.1" min="0" oninput="validarRangoConfiguracionTareas()">
+                        </div>
+                        <div class="input-group">
+                            <label for="duracionMaximaTarea">
+                                <img src="../storage/vectors/clock-svgrepo-com.svg" alt="" class="input-icon">
+                                Duración Máxima (horas):
+                            </label>
+                            <input type="number" id="duracionMaximaTarea" value="40" step="0.1" min="0" oninput="validarRangoConfiguracionTareas()">
+                        </div>
+                    </div>
+                    
+                    <div class="info-note">
+                        <strong><img src="../storage/vectors/traffic-light-svgrepo-com.svg" alt="" class="traffic-light-icon"> Nota:</strong> Estos rangos se aplicarán específicamente a las tareas:<br>
+                        <strong><img src="../storage/vectors/clock-svgrepo-com.svg" alt="" class="input-icon"> Duración:</strong> Tiempo permitido para las tareas<br>
+                        <strong>Validación:</strong> Se validará al crear o editar tareas<br>
+                        <strong><img src="../storage/vectors/lightbulb-alt-svgrepo-com.svg" alt="" class="input-icon"> Aplicación:</strong> Los cambios se aplicarán inmediatamente
+                    </div>
+                    
+                    <div class="range-display-container">
+                        <div id="rangosActualesTareas" class="range-display">
+                            <strong>Rangos configurados:</strong><br>
+                            Duración: 0.5 - 40.0 horas
+                        </div>
+                    </div>
+                    
+                    <button id="btnAplicarConfiguracionTareas" onclick="aplicarConfiguracionTareas()" class="button button-success" disabled>
+                        <img src="../storage/vectors/circle-check-svgrepo-com.svg" alt="" class="button-icon">
+                        Aplicar Configuración de Tareas
+                    </button>
+                </div>
+
+
+
+
+
+
+            </div>
+            <div class="modal-footer">
+                <div class="buttons-section">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación para Eliminar Tarea -->
+    <div id="modalConfirmacionEliminarTarea" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="modal-title-icon">
+                    Confirmar Eliminación
+                </h2>
+                <button onclick="cerrarModalConfirmacionEliminarTarea()" class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmacion-mensaje">
+                    <img src="../storage/vectors/alarm-exclamation-svgrepo-com.svg" alt="" class="confirmacion-icon">
+                    <p id="mensajeConfirmacionEliminarTarea">¿Está seguro de que desea eliminar esta tarea?</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="buttons-section">
+                    <button onclick="confirmarEliminarTarea()" class="button button-danger">
+                        <img src="../storage/vectors/trash-svgrepo-com.svg" alt="" class="button-icon">
+                        Sí, Eliminar
+                    </button>
+                    <button onclick="cerrarModalConfirmacionEliminarTarea()" class="button button-info">
+                        <img src="../storage/vectors/ban-svgrepo-com.svg" alt="" class="button-icon">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/Personal.js"></script>
+    <script src="../js/Material.js"></script>
+    <script src="../js/OtrosCostos.js"></script>
+    <script src="../js/Tarea.js"></script>
+    <script src="../js/tareas.js"></script>
+    
+    <script>
+        // Función para alternar el estado del sidebar
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+    </script>
+</body>
+</html>
