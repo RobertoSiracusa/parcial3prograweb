@@ -1,17 +1,7 @@
-// ===== FUNCIONES DE CONFIGURACIÓN GLOBAL =====
-let configuracionGlobal = {
-    rangos: { minimo: 1, maximo: 1000 }
-};
-
 // Cerrar modal al hacer clic fuera de él
 window.onclick = function(event) {
-    const modalConfig = document.getElementById('modalConfiguracion');
     const modalEliminarDatos = document.getElementById('modalEliminarDatosProyecto');
     const modalConfirmacion = document.getElementById('modalConfirmacionEliminacion');
-    
-    if (event.target === modalConfig) {
-        cerrarModalConfiguracion();
-    }
     
     if (event.target === modalEliminarDatos) {
         cerrarModalEliminarDatos();
@@ -20,60 +10,6 @@ window.onclick = function(event) {
     if (event.target === modalConfirmacion) {
         cerrarModalConfirmacion();
     }
-}
-
-function abrirModalConfiguracion() {
-    cargarConfiguracionGlobal();
-    document.getElementById('modalConfiguracion').style.display = 'block';
-    actualizarInterfazConfiguracion();
-}
-
-function cerrarModalConfiguracion() {
-    document.getElementById('modalConfiguracion').style.display = 'none';
-}
-
-// Cargar configuración desde localStorage
-function cargarConfiguracionGlobal() {
-    const configGuardada = localStorage.getItem('configuracionSistema');
-    if (configGuardada) {
-        try {
-            configuracionGlobal = { ...configuracionGlobal, ...JSON.parse(configGuardada) };
-        } catch (error) {
-            console.warn('Error al cargar configuración guardada:', error);
-        }
-    }
-}
-
-
-function actualizarRangoGlobalMostrado() {
-    const minimo = parseFloat(document.getElementById('rangoMinimoGlobal').value) || 0;
-    const maximo = parseFloat(document.getElementById('rangoMaximoGlobal').value) || 999999;
-    document.getElementById('rangoGlobalActual').textContent = `Rango global: $${minimo.toFixed(2)} - $${maximo.toFixed(2)}`;
-}
-
-function aplicarConfiguracionGlobal() {
-    const minimo = parseFloat(document.getElementById('rangoMinimoGlobal').value);
-    const maximo = parseFloat(document.getElementById('rangoMaximoGlobal').value);
-    
-    if (minimo >= maximo) {
-        alert("⚠️ Error: El valor mínimo debe ser menor que el máximo");
-        return;
-    }
-    
-    configuracionGlobal.rangos.minimo = minimo;
-    configuracionGlobal.rangos.maximo = maximo;
-    
-    // Guardar en localStorage
-    localStorage.setItem('configuracionSistema', JSON.stringify(configuracionGlobal));
-    localStorage.setItem('rangosGlobales', JSON.stringify({
-        minimo: minimo,
-        maximo: maximo
-    }));
-    
-    actualizarRangoGlobalMostrado();
-    
-    alert(`✅ Configuración global aplicada:\nRango: $${minimo.toFixed(2)} - $${maximo.toFixed(2)}\n\n` +
-          `Se aplicará a:\n• Empleados (costo por hora)\n• Materiales (costo por unidad)\n• Otros costos`);
 }
 
 // ===== FUNCIONES DEL DASHBOARD =====

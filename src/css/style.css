@@ -165,15 +165,7 @@ body {
     padding: 20px 10px;
 }
 
-.settings-link {
-    background: none;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-    text-align: left;
-    font-family: inherit;
-    font-size: inherit;
-}
+
 
 /* Main Content */
 .main-content {
@@ -4263,7 +4255,6 @@ body {
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
-
 .employee-selector select:hover {
     border-color: #667eea;
 }
