@@ -156,6 +156,16 @@ body {
     font-size: 14px;
 }
 
+.settings-link {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    font-size: inherit;
+}
+
 .sidebar-footer {
     padding: 20px;
     border-top: 1px solid #334155;
