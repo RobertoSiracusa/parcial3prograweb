@@ -62,11 +62,19 @@
             </div>
         </aside>
 
+        <!-- Overlay para móviles -->
+        <div class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
         <!-- Main Content -->
         <main class="main-content">
             <!-- Header -->
             <header class="main-header">
                 <div class="header-left">
+                    <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
                     <h1 class="page-title">Dashboard</h1>
                     <p class="page-subtitle">Bienvenido al sistema de control de proyectos</p>
                 </div>

@@ -1074,8 +1074,62 @@ function toggleSidebar() {
     sidebar.classList.toggle('collapsed');
 }
 
+// Función para alternar el sidebar en dispositivos móviles
+function toggleMobileSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const mobileToggle = document.querySelector('.mobile-menu-toggle');
+    const overlay = document.querySelector('.sidebar-overlay');
+    
+    sidebar.classList.toggle('open');
+    mobileToggle.classList.toggle('active');
+    
+    if (sidebar.classList.contains('open')) {
+        overlay.style.display = 'block';
+        setTimeout(() => overlay.classList.add('active'), 10);
+    } else {
+        overlay.classList.remove('active');
+        setTimeout(() => overlay.style.display = 'none', 300);
+    }
+}
+
+// Función para cerrar el sidebar móvil
+function closeMobileSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const mobileToggle = document.querySelector('.mobile-menu-toggle');
+    const overlay = document.querySelector('.sidebar-overlay');
+    
+    sidebar.classList.remove('open');
+    mobileToggle.classList.remove('active');
+    overlay.classList.remove('active');
+    setTimeout(() => overlay.style.display = 'none', 300);
+}
+
 // Inicializar el dashboard cuando se carga la página
 document.addEventListener('DOMContentLoaded', function() {
     cargarEstadisticasDashboard();
     initializeProjectDashboard();
+    
+    // Cerrar sidebar móvil al hacer clic en enlaces de navegación
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                closeMobileSidebar();
+            }
+        });
+    });
+    
+    // Cerrar sidebar móvil al redimensionar la ventana
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            const sidebar = document.querySelector('.sidebar');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            const overlay = document.querySelector('.sidebar-overlay');
+            
+            sidebar.classList.remove('open');
+            mobileToggle.classList.remove('active');
+            overlay.classList.remove('active');
+            overlay.style.display = 'none';
+        }
+    });
 });
